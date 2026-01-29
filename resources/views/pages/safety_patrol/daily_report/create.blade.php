@@ -1,0 +1,245 @@
+<x-layouts.app title="Tambah Safety Report">
+    <main class="flex flex-col gap-6 flex-1" x-data="reportForm(@js($projects))" x-init="unsafeActions = [];
+    unsafeConditions = [];">
+
+        @if (session('success'))
+            <div class="p-4 bg-green-100 border border-green-300 text-green-800 rounded-md text-sm">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <div class="bg-white shadow-lg rounded-xl p-6">
+            <form action="{{ route('daily-report.store') }}" method="post" enctype="multipart/form-data" class="space-y-6">
+                @csrf
+                <!-- Header -->
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-semibold text-slate-800">Laporan Baru</h2>
+                </div>
+
+                <!-- Project & Date -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <x-input-label required="true" for="project_safety_id">Project</x-input-label>
+                        <select x-model="selectedProject" @change="updateDateRange"
+                            class="border border-slate-300 rounded-lg text-sm w-full p-2" name="project_safety_id"
+                            id="project_safety_id">
+                            <option value="" selected>--- Pilih Project ---</option>
+                            @foreach ($projects as $project)
+                                <option value="{{ $project->id }}">{{ $project->nama }} - {{ $project->lokasi }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <x-input-label required="true" for="tanggal">Tanggal</x-input-label>
+                        <input type="date" name="tanggal" id="tanggal" :min="minDate"
+                            :max="maxDate" class="border border-slate-300 rounded-lg text-sm w-full p-2"
+                            value="{{ $today }}">
+                    </div>
+                </div>
+
+                <!-- Permit, pekerja, jam -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <x-input-label required="true" for="permit">Permit</x-input-label>
+                        <select name="permit" id="permit"
+                            class="border border-slate-300 rounded-lg text-sm w-full p-2">
+                            @foreach ($permits as $permit)
+                                <option value="{{ $permit }}">{{ $permit }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <x-input-label required="true" for="jumlah_pekerja">Jumlah Pekerja</x-input-label>
+                        <x-input-form type="number" min="0" value="0" name="jumlah_pekerja"
+                            class="!rounded-lg" id="jumlah_pekerja" />
+                    </div>
+
+                    <div>
+                        <x-input-label required="true" for="jam_kerja">Jam Kerja</x-input-label>
+                        <x-input-form type="number" min="0" value="0" name="jam_kerja" class="!rounded-lg"
+                            id="jam_kerja" />
+                    </div>
+                </div>
+
+                <!-- Deskripsi -->
+                <div>
+                    <x-input-label for="deskripsi">Deskripsi (opsional)</x-input-label>
+                    <textarea name="deskripsi" id="deskripsi" class="border border-slate-300 rounded-lg text-sm w-full p-2 h-24"></textarea>
+                </div>
+
+                <hr class="border-slate-200">
+
+                <!-- Safety Lapangan -->
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-2">Safety Lapangan</h3>
+                    <x-checkbox-group name="users" :options="$users" :current-user="auth()->user()" label="Kontributor Laporan" />
+                </div>
+
+                <hr class="border-slate-200">
+
+                <!-- Unsafe Action -->
+                <div x-data>
+                    <h3 class="text-lg font-semibold text-slate-800 mb-3">Unsafe Action</h3>
+
+                    <template x-for="(item, index) in unsafeActions" :key="index">
+                        <div class="mb-4 p-4 border rounded-lg bg-slate-50">
+
+                            <!-- Textarea -->
+                            <label class="font-semibold text-sm block mb-1">
+                                Deskripsi Unsafe Action #<span x-text="index + 1"></span>
+                            </label>
+                            <input type="text" class="border border-slate-300 rounded-lg text-sm w-full p-2"
+                                :name="'unsafe_action[' + index + '][text]'" x-model="item.text"></input>
+
+                            <!-- Upload Foto -->
+                            <div class="mt-3">
+                                <label class="font-semibold text-sm block mb-1">
+                                    Upload Foto #<span x-text="index + 1"></span>
+                                </label>
+
+                                <input type="file" multiple accept="image/*"
+                                    :name="'unsafe_action[' + index + '][images][]'"
+                                    class="border border-slate-300 rounded-lg text-sm w-full p-2">
+                            </div>
+
+                            <!-- Delete -->
+                            <button type="button" class="mt-2 text-sm text-red-600 hover:underline"
+                                @click="unsafeActions.splice(index, 1)" x-show="unsafeActions.length > 0">
+                                Hapus Item
+                            </button>
+
+                        </div>
+                    </template>
+
+                    <p class="text-sm text-slate-500 italic mb-3" x-show="unsafeActions.length === 0">
+                        Belum ada Unsafe Action yang ditambahkan
+                    </p>
+
+                    <!-- BUTTON ADD -->
+                    <button type="button"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow text-sm hover:bg-indigo-700"
+                        @click="unsafeActions.push({ text: '', images: [] })">
+                        + Tambah Unsafe Action
+                    </button>
+                </div>
+
+
+                <hr class="border-slate-200">
+
+                <!-- Unsafe Condition -->
+                <div x-data class="mt-8">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-3">Unsafe Condition</h3>
+
+                    <template x-for="(item, index) in unsafeConditions" :key="index">
+                        <div class="mb-4 p-4 border rounded-lg bg-slate-50">
+
+                            <!-- Textarea -->
+                            <label class="font-semibold text-sm block mb-1">
+                                Deskripsi Unsafe Condition #<span x-text="index + 1"></span>
+                            </label>
+
+                            <input type="text" class="border border-slate-300 rounded-lg text-sm w-full p-2"
+                                :name="'unsafe_condition[' + index + '][text]'" x-model="item.text"></input>
+
+                            <!-- Upload Foto -->
+                            <div class="mt-3">
+                                <label class="font-semibold text-sm block mb-1">
+                                    Upload Foto #<span x-text="index + 1"></span>
+                                </label>
+
+                                <input type="file" multiple accept="image/*"
+                                    :name="'unsafe_condition[' + index + '][images][]'"
+                                    class="border border-slate-300 rounded-lg text-sm w-full p-2">
+                            </div>
+
+                            <!-- Delete -->
+                            <button type="button" class="mt-2 text-sm text-red-600 hover:underline"
+                                @click="unsafeConditions.splice(index, 1)" x-show="unsafeConditions.length > 0">
+                                Hapus Item
+                            </button>
+
+                        </div>
+                    </template>
+
+                    <p class="text-sm text-slate-500 italic mb-3" x-show="unsafeConditions.length === 0">
+                        Belum ada Unsafe Condition yang ditambahkan
+                    </p>
+
+                    <!-- BUTTON ADD -->
+                    <button type="button"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow text-sm hover:bg-indigo-700"
+                        @click="unsafeConditions.push({ text: '', images: [] })">
+                        + Tambah Unsafe Condition
+                    </button>
+                </div>
+
+
+                <hr class="border-slate-200">
+
+                <!-- Reward, Punishment, dll -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="font-semibold" for="reward">Reward</label>
+                        <textarea name="reward" id="reward" class="border border-slate-300 rounded-lg text-sm w-full p-2 h-24"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="font-semibold" for="punishment">Punishment</label>
+                        <textarea name="punishment" id="punishment" class="border border-slate-300 rounded-lg text-sm w-full p-2 h-24"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="font-semibold" for="kecelakaan">Kecelakaan</label>
+                        <textarea name="kecelakaan" id="kecelakaan" class="border border-slate-300 rounded-lg text-sm w-full p-2 h-24"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="font-semibold" for="nearmiss">Nearmiss</label>
+                        <textarea name="nearmiss" id="nearmiss" class="border border-slate-300 rounded-lg text-sm w-full p-2 h-24"></textarea>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="pt-4">
+                    <button type="submit"
+                        class="bg-blue-700 text-white rounded-lg shadow-md py-2.5 px-4 w-full text-sm hover:bg-blue-600 transition">
+                        Submit
+                    </button>
+                </div>
+            </form>
+
+
+        </div>
+
+    </main>
+    <script>
+        function reportForm(projects) {
+            return {
+                projects,
+                selectedProject: null,
+                minDate: '',
+                maxDate: '',
+
+                unsafeActions: [],
+                unsafeConditions: [],
+
+                updateDateRange() {
+                    const p = this.projects.find(pr => pr.id == this.selectedProject);
+
+                    if (p) {
+                        this.minDate = p.tanggal_mulai;
+                        this.maxDate = p.tanggal_selesai;
+                    } else {
+                        this.minDate = '';
+                        this.maxDate = '';
+                    }
+                }
+            };
+
+        }
+    </script>
+
+</x-layouts.app>
