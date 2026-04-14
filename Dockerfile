@@ -1,15 +1,13 @@
 FROM php:8.2-cli
 
 RUN apt-get update && apt-get install -y \
-    git unzip libpng-dev libjpeg-dev libfreetype6-dev libzip-dev zip libpq-dev \
+    git unzip curl nodejs npm \
+    libpng-dev libjpeg-dev libfreetype6-dev libzip-dev zip libpq-dev \
     && docker-php-ext-configure gd \
         --with-freetype \
         --with-jpeg \
     && docker-php-ext-install \
-        gd \
-        zip \
-        pdo \
-        pdo_pgsql
+        gd zip pdo pdo_pgsql
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -18,11 +16,14 @@ COPY . .
 
 RUN rm -f .env
 
+# 🔥 INSTALL BACKEND
 RUN composer install --no-dev --optimize-autoloader
 
-RUN chmod -R 775 storage bootstrap/cache
+# 🔥 INSTALL FRONTEND
+RUN npm install
+RUN npm run build
 
-RUN rm -rf bootstrap/cache/*.php
+RUN chmod -R 775 storage bootstrap/cache
 
 CMD php artisan config:clear && \
     php artisan config:cache && \
