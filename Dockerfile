@@ -18,11 +18,10 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
-RUN mkdir -p database && touch database/database.sqlite
-
-RUN php artisan config:clear && \
-    php artisan cache:clear
-
 RUN chmod -R 775 storage bootstrap/cache
 
-CMD php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=$PORT
+# ✅ semua artisan pindah ke runtime
+CMD php artisan config:clear && \
+    php artisan cache:clear && \
+    php artisan migrate --force && \
+    php artisan serve --host=0.0.0.0 --port=$PORT
