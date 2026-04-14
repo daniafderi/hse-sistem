@@ -18,6 +18,8 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
+RUN mkdir -p database && touch database/database.sqlite
+
 RUN php artisan config:clear && \
     php artisan cache:clear
 
