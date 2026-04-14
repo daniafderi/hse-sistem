@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notifications', function (Blueprint $table) {
+        Schema::create('stock_apd_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_safety_id');
-            $table->text('message');
-            $table->boolean('is_read')->default(false);
+            $table->foreignId('tool_id')->constrained()->cascadeOnDelete();
+            $table->enum('type', ['in', 'out']);
+            $table->integer('quantity');
+            $table->text('note')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('notifications');
+        Schema::dropIfExists('stock_apd_transactions');
     }
 };

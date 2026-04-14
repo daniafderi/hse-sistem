@@ -31,6 +31,11 @@ details:not([open]) > .dropdown-content {
     animation: slideUp 3s ease forwards;
 }
 
+span[aria-current="page"] span {
+    background-color: rgb(79 70 229 / var(--tw-text-opacity, 1));
+    color: #fff;
+}
+
 @keyframes slideDown {
     0% {
         opacity: 0;

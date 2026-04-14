@@ -14,4 +14,8 @@ class Tool extends Model
     {
         return $this->hasMany(LoanItem::class);
     }
+
+    public function stockTransaction() {
+        return $this->hasMany(StockApdTransaction::class);
+    }
 }

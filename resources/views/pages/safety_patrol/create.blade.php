@@ -72,7 +72,7 @@
                 <div class="flex justify-end pt-4 gap-2.5">
                     <a href="{{ route('project.index') }}" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-600 hover:text-indigo-600 hover:border-indigo-400 px-4 py-2 rounded-lg text-sm shadow-sm transition">Batal</a>
                     <button type="submit"
-                        class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md transition">
+                        class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md transition">
                         <i class="ri-send-plane-line mr-2"></i> Submit
                     </button>
                 </div>

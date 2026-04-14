@@ -3,10 +3,9 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Carbon\Carbon;
 use App\Models\ProjectSafety;
-use App\Models\DailySafetyPatrol;
-use App\Models\User;
-use App\Notifications\LaporanBelumDibuatNotification;
+use App\Models\Notification;
 
 class CheckSafetyPatrolReport extends Command
 {
@@ -15,7 +14,7 @@ class CheckSafetyPatrolReport extends Command
      *
      * @var string
      */
-    protected $signature = 'app:check-safety-patrol-report';
+    protected $signature = 'notif:check-safety';
 
     /**
      * The console command description.
@@ -29,24 +28,24 @@ class CheckSafetyPatrolReport extends Command
      */
     public function handle()
     {
-        if (now()->format('H:i') < '16:00') return;
+        $now = Carbon::now();
 
-        $today = now()->toDateString();
+        // hanya jalan setelah jam 16
+        if ($now->format('H:i') >= '16:00') {
 
-        $projects = ProjectSafety::whereDate('tanggal_mulai', '<=', $today)
-            ->whereDate('tanggal_selesai', '>=', $today)
-            ->get();
+            $projects = ProjectSafety::whereDate('tanggal_mulai', '<=', $now)
+                ->whereDate('tanggal_selesai', '>=', $now)
+                ->whereDoesntHave('dailySafetyPatrol', function ($q) use ($now) {
+                    $q->whereDate('tanggal', $now);
+                })
+                ->get();
 
-        foreach ($projects as $project) {
-            $exists = DailySafetyPatrol::where('project_safety_id', $project->id)
-                ->whereDate('tanggal', $today)
-                ->exists();
+            foreach ($projects as $project) {
 
-            if (!$exists) {
-                $users = User::where('role', 'supervisor')->get();
-                foreach ($users as $user) {
-                    $user->notify(new LaporanBelumDibuatNotification($project));
-                }
+                Notification::create([
+                    'project_id' => $project->id,
+                    'message' => 'Laporan safety patrol hari ini belum dibuat'
+                ]);
             }
         }
     }

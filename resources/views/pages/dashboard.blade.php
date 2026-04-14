@@ -166,6 +166,12 @@
                             Kirim Pengingat
                         </button>
                     </div>
+
+                    @foreach($notifs as $notif)
+<div class="alert alert-danger">
+    {{ $notif->message }}
+</div>
+@endforeach
                 </div>
             </div>
         </div>

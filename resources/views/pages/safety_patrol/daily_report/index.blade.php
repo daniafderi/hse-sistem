@@ -22,8 +22,8 @@
 
                     <div class="relative w-full sm:w-56">
                         <input type="text" placeholder="Cari laporan..."
-                            class="w-full pl-9 pr-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <i class="ri-search-line absolute left-3 top-2.5 text-gray-400"></i>
+                            class="w-full pl-9 pr-4 py-2 border rounded-lg text-sm border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <i class="ri-search-line absolute left-3 top-2 text-gray-400"></i>
                     </div>
                 </div>
             </div>

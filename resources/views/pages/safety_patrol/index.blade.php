@@ -53,8 +53,8 @@
 
                 <select onchange="location.href=this.value"
                     class="w-full md:w-auto border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500">
-                    <option value="{{ request()->fullUrlWithQuery(['sort' => 'terbaru']) }}">Urutkan: Terbaru</option>
-                    <option value="{{ request()->fullUrlWithQuery(['sort' => 'terlama']) }}">Urutkan: Terlama</option>
+                    <option value="{{ request()->fullUrlWithQuery(['sort' => 'terbaru']) }}" @if(request()->sort == 'terbaru') selected @endif>Urutkan: Terbaru</option>
+                    <option value="{{ request()->fullUrlWithQuery(['sort' => 'terlama']) }}" @if(request()->sort == 'terlama') selected @endif>Urutkan: Terlama</option>
                 </select>
             </div>
 

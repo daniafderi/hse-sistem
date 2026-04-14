@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\DailySafetyPatrol;
 use App\Models\ProjectSafety;
 use App\Models\SafetyBriefing;
+use App\Models\Notification;
 
 class DashboardController extends Controller
 {
@@ -37,8 +38,10 @@ class DashboardController extends Controller
 
         $projectBerjalan = ProjectSafety::where('status', 'berjalan')->count();
 
+        $notifs = Notification::where('is_read', false)->latest()->get();
+
         //dd($percent);
 
-        return view('pages.dashboard', compact(['patrolWeekNow', 'patrolPercent', 'breafingWeekNow', 'breafingPercent', 'projectBerjalan']));
+        return view('pages.dashboard', compact(['patrolWeekNow', 'patrolPercent', 'breafingWeekNow', 'breafingPercent', 'projectBerjalan', 'notifs']));
     }
 }

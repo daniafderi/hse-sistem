@@ -1,5 +1,5 @@
 <x-layouts.app title="Equipment">
-    <div class="bg-white rounded-lg shadow-md min-h-screen p-4 sm:p-6">
+    <div class="bg-white rounded-lg shadow-md min-h-screen p-4 sm:p-6" x-data="{ open: false, type: 'in' }">
         <div class="max-w-7xl mx-auto space-y-4">
 
             <!-- Header -->
@@ -12,19 +12,24 @@
                         Manajemen data alat kerja dan perlengkapan keselamatan
                     </p>
                 </div>
-                <a href="{{ route('tools.create') }}"
-                   class="inline-flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition">
-                    <i class="ri-add-line"></i> Tambah Alat / APD
-                </a>
+                <div class="inline-flex gap-4">
+                    <button @click="open = true"
+                        class="px-4 text-sm font-medium py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
+                        + Transaksi Stok
+                    </button>
+                    <a href="{{ route('tools.create') }}"
+                        class="inline-flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition">
+                        <i class="ri-add-line"></i> Tambah Alat / APD
+                    </a>
+                </div>
             </div>
 
             <!-- Search & Filter -->
             <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div class="relative w-full md:max-w-md">
                     <i class="ri-search-line absolute left-3 top-2.5 text-gray-400"></i>
-                    <input type="text"
-                           placeholder="Cari alat atau APD..."
-                           class="pl-10 w-full border border-gray-200 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="text" placeholder="Cari alat atau APD..."
+                        class="pl-10 w-full border border-gray-200 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-2">
@@ -97,7 +102,7 @@
 
                                 <td class="px-4 sm:px-6 py-4 text-center">
                                     <a href="{{ route('tools.show', $tool['id']) }}"
-                                       class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium
+                                        class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium
                                        text-indigo-600 hover:text-white hover:bg-indigo-600
                                        rounded-lg border border-indigo-600 transition">
                                         <i class="ri-eye-line"></i>
@@ -115,7 +120,124 @@
                     </tbody>
                 </table>
             </div>
+<!-- Overlay -->
+        <div x-show="open" x-transition
+            class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
 
+            <!-- Modal -->
+            <div @click.outside="open = false" x-show="open" x-transition.scale
+                class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6">
+
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">
+                        Transaksi Stok APD
+                    </h2>
+                    <button @click="open = false" class="text-gray-400 hover:text-gray-600">
+                        ✕
+                    </button>
+                </div>
+
+                <!-- Form -->
+                <form class="space-y-4">
+
+                    <!-- Select APD -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Pilih APD
+                        </label>
+                        <select class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                            <option>Helm Safety</option>
+                            <option>Sepatu Safety</option>
+                            <option>Rompi</option>
+                        </select>
+                    </div>
+
+                    <!-- Jenis Transaksi -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Jenis Transaksi
+                        </label>
+
+                        <div class="grid grid-cols-2 gap-3">
+
+                            <!-- Stok Masuk -->
+                            <label @click="type = 'in'"
+                                :class="type === 'in' ? 'border-green-500 bg-green-50' : 'border-gray-200'"
+                                class="cursor-pointer border rounded-xl p-3 flex items-center gap-2 transition">
+                                <input type="radio" value="in" x-model="type" class="hidden">
+                                <span class="text-green-600 text-lg">⬆</span>
+                                <div>
+                                    <p class="font-medium text-gray-800">Stok Masuk</p>
+                                    <p class="text-xs text-gray-500">Penambahan stok</p>
+                                </div>
+                            </label>
+
+                            <!-- Stok Keluar -->
+                            <label @click="type = 'out'"
+                                :class="type === 'out' ? 'border-red-500 bg-red-50' : 'border-gray-200'"
+                                class="cursor-pointer border rounded-xl p-3 flex items-center gap-2 transition">
+                                <input type="radio" value="out" x-model="type" class="hidden">
+                                <span class="text-red-600 text-lg">⬇</span>
+                                <div>
+                                    <p class="font-medium text-gray-800">Stok Keluar</p>
+                                    <p class="text-xs text-gray-500">Pengurangan stok</p>
+                                </div>
+                            </label>
+
+                        </div>
+                    </div>
+
+                    <!-- Jumlah -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Jumlah
+                        </label>
+                        <input type="number" min="1"
+                            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                            placeholder="Masukkan jumlah">
+                    </div>
+
+                    <!-- Keterangan -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Keterangan (opsional)
+                        </label>
+                        <textarea class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" rows="2"
+                            placeholder="Contoh: pembelian baru / pemakaian proyek"></textarea>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="flex justify-end gap-2 pt-4">
+                        <button type="button" @click="open = false"
+                            class="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-100">
+                            Batal
+                        </button>
+
+                        <button type="submit"
+                            :class="type === 'in'
+                                ?
+                                'bg-green-600 hover:bg-green-700' :
+                                'bg-red-600 hover:bg-red-700'"
+                            class="px-4 py-2 text-white rounded-lg shadow transition">
+                            Simpan
+                        </button>
+                    </div>
+
+                </form>
+            </div>
         </div>
+        </div>
+    </div>
+    <!-- Alpine Init -->
+    <div x-data="{ open: false, type: 'in' }" class="p-6">
+
+        <!-- Button Open Modal -->
+        <button @click="open = true"
+            class="px-5 py-2.5 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition">
+            + Transaksi Stok
+        </button>
+
+        
     </div>
 </x-layouts.app>

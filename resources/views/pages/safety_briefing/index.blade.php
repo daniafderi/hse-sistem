@@ -20,7 +20,7 @@
                     </a>
 
                     <form action="{{ route('safety-briefing.index') }}" method="get" class="relative">
-                        <i class="ri-search-line absolute left-3 top-2.5 text-gray-400"></i>
+                        <i class="ri-search-line absolute left-3 top-2 text-gray-400"></i>
                         <input name="search"
                                type="text"
                                placeholder="Cari briefing..."

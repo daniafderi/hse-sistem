@@ -16,19 +16,19 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1" for="tempat">Tempat <span
                                 class="text-red-500">*</span></label>
                         <input name="tempat" id="tempat" type="text" placeholder="Masukkan lokasi briefing"
-                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm">
+                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" for="pekerjaan">Pekerjaan <span
                                 class="text-red-500">*</span></label>
                         <input name="pekerjaan" id="pekerjaan" type="text" placeholder="Masukkan nama pekerjaan"
-                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm">
+                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" for="jumlah_peserta">Jumlah Peserta <span
                                 class="text-red-500">*</span></label>
                         <input id="jumlah_peserta" name="jumlah_peserta" type="number" min="0" placeholder="0"
-                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm">
+                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm" required>
                     </div>
                 </div>
 

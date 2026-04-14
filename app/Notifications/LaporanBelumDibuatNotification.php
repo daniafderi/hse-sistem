@@ -17,7 +17,7 @@ class LaporanBelumDibuatNotification extends Notification
      */
     public function __construct($project)
     {
-         $this->project = $project;
+
     }
 
     /**
