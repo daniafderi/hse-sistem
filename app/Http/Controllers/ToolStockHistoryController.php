@@ -2,64 +2,44 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StockApdTransaction;
+use App\Models\Tool;
 use App\Models\ToolStockHistory;
 use Illuminate\Http\Request;
 
 class ToolStockHistoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'tool_id' => 'required|exists:tools,id',
+            'type' => 'required|in:in,out',
+            'quantity' => 'required|integer|min:1',
+            'note' => 'nullable|string'
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ToolStockHistory $toolStockHistory)
-    {
-        //
-    }
+        $apd = Tool::findOrFail($request->tool_id);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ToolStockHistory $toolStockHistory)
-    {
-        //
-    }
+        // 🔴 VALIDASI STOK TIDAK BOLEH MINUS
+        if ($request->type === 'out' && $apd->stock < $request->quantity) {
+            return back()->with('error', 'Stok tidak mencukupi!');
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ToolStockHistory $toolStockHistory)
-    {
-        //
-    }
+        // 💾 SIMPAN TRANSAKSI
+        StockApdTransaction::create([
+            'tool_id' => $apd->id,
+            'type' => $request->type,
+            'quantity' => $request->quantity,
+            'note' => $request->note
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ToolStockHistory $toolStockHistory)
-    {
-        //
+        // 🔄 UPDATE STOK
+        if ($request->type === 'in') {
+            $apd->increment('stock', $request->quantity);
+        } else {
+            $apd->decrement('stock', $request->quantity);
+        }
+
+        return back()->with('success', 'Transaksi berhasil!');
     }
 }

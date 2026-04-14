@@ -122,7 +122,7 @@
             </div>
 <!-- Overlay -->
         <div x-show="open" x-transition
-            class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 mt-0">
 
             <!-- Modal -->
             <div @click.outside="open = false" x-show="open" x-transition.scale
@@ -139,17 +139,17 @@
                 </div>
 
                 <!-- Form -->
-                <form class="space-y-4">
-
+                <form class="space-y-4" method="POST" action="{{ route('stock-transactions.store') }}">
+                    @csrf
                     <!-- Select APD -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Pilih APD
                         </label>
-                        <select class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
-                            <option>Helm Safety</option>
-                            <option>Sepatu Safety</option>
-                            <option>Rompi</option>
+                        <select name="tool_id" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                            @foreach ($tools as $tool)
+                                <option value="{{ $tool->id }}">{{ $tool->name }}</option>
+                            @endforeach
                         </select>
                     </div>
 

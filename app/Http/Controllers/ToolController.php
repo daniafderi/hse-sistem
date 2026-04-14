@@ -32,6 +32,7 @@ class ToolController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'stock' => 'required|integer|min:0',
+            'stock_minimum' => 'required|integer|min:0'
         ]);
         Tool::create($data);
         return redirect()->route('tools.index')->with('success', 'Alat

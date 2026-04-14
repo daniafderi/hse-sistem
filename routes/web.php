@@ -11,6 +11,7 @@ use App\Http\Controllers\LoanController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanExportController;
+use App\Http\Controllers\ToolStockHistoryController;
 use App\Http\Controllers\ValidationSafetyPatrolController;
 
 Route::get('/', function () {
@@ -20,6 +21,8 @@ Route::get('/', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/laporan/export', [LaporanExportController::class, 'export'])->name('laporan.export');
     Route::get('/export/laporan', [LaporanExportController::class, 'index'])->name('export.index');
+    Route::post('/stock-transactions', [ToolStockHistoryController::class, 'store'])
+    ->name('stock-transactions.store');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('/user', UserController::class);
     Route::prefix('/safety-patrol')->group(function () {
