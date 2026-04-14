@@ -18,6 +18,14 @@ Route::get('/', function () {
     return redirect('/dashboard');
 });
 
+Route::get('/debug-env', function () {
+    return [
+        'DB_CONNECTION' => env('DB_CONNECTION'),
+        'DB_HOST' => env('DB_HOST'),
+        'DATABASE_URL' => env('DATABASE_URL'),
+    ];
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/laporan/export', [LaporanExportController::class, 'export'])->name('laporan.export');
     Route::get('/export/laporan', [LaporanExportController::class, 'index'])->name('export.index');

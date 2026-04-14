@@ -22,4 +22,6 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN chmod -R 775 storage bootstrap/cache
 
+RUN rm -rf bootstrap/cache/*.php
+
 CMD php artisan optimize:clear && php artisan serve --host=0.0.0.0 --port=$PORT
