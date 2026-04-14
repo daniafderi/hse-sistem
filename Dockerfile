@@ -23,8 +23,12 @@ RUN composer install --no-dev --optimize-autoloader
 RUN chmod -R 775 storage bootstrap/cache
 
 # ✅ semua artisan pindah ke runtime
-CMD php artisan config:clear && \
-    php artisan cache:clear && \
-    php artisan config:cache && \
+CMD export DB_CONNECTION=pgsql && \
+    export DB_HOST=$PGHOST && \
+    export DB_PORT=$PGPORT && \
+    export DB_DATABASE=$PGDATABASE && \
+    export DB_USERNAME=$PGUSER && \
+    export DB_PASSWORD=$PGPASSWORD && \
+    php artisan config:clear && \
     php artisan migrate --force && \
     php artisan serve --host=0.0.0.0 --port=$PORT
