@@ -22,12 +22,11 @@ RUN composer install --no-dev --optimize-autoloader
 # 🔥 INSTALL FRONTEND
 RUN npm install
 RUN npm run build
-RUN npm run dev
 
 RUN chmod -R 775 storage bootstrap/cache
 
 CMD php artisan config:clear && \
+    php artisan cache:clear && \
     php artisan config:cache && \
     php artisan migrate --force && \
-    php artisan db:seed --force && \
     php artisan serve --host=0.0.0.0 --port=$PORT
