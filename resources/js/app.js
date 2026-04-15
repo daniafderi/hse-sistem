@@ -1,4 +1,5 @@
 import './bootstrap';
+import './components/toast.js';
 
 import { initQuillEditors } from './components/quill';
 
