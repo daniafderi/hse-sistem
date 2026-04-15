@@ -1,5 +1,3 @@
-@vite(['resources/js/components/toast.js']);
-
 <script>
 function dropdownMenu() {
     return {
