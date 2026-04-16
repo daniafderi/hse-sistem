@@ -50,14 +50,14 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-500">Alat & APD Aktif</p>
-                            <h2 class="text-2xl font-bold text-gray-800 mt-1">58</h2>
+                            <h2 class="text-2xl font-bold text-gray-800 mt-1">{{ $toolsStock }}</h2>
                         </div>
                         <div class="w-10 h-10 flex items-center justify-center bg-yellow-100 text-yellow-600 rounded-full">
                             <i class="ri-tools-line text-xl"></i>
                         </div>
                     </div>
-                    <div class="mt-3 text-xs text-gray-500">
-                        <span class="text-red-500 font-medium">-3%</span> dari stok sebelumnya
+                    <div class="mt-3 text-xs text-gray-500 ">
+                        <span class="text-red-500 font-medium hidden">-3%</span> Dari total stock APD
                     </div>
                 </div>
     
@@ -65,8 +65,8 @@
                 <div class="bg-white rounded-xl p-5 shadow-sm border hover:shadow-md transition">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm text-gray-500">Inspeksi Selesai</p>
-                            <h2 class="text-2xl font-bold text-gray-800 mt-1">91%</h2>
+                            <p class="text-sm text-gray-500">Project Selesai</p>
+                            <h2 class="text-2xl font-bold text-gray-800 mt-1">{{ number_format($projectPercentage, 0) }}%</h2>
                         </div>
                         <div class="w-10 h-10 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-full">
                             <i class="ri-pie-chart-line text-xl"></i>

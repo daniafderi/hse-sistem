@@ -66,7 +66,7 @@
                 <div class="mt-6">
                     <div class="flex justify-between items-center text-xs sm:text-sm text-gray-600 mb-1">
                         <span>Progress</span>
-                        <span>{{ $project->status === 'Selesai' ? '100' : ($project->dailySafetyPatrol->count() / $period) * 100 }}%</span>
+                        <span>{{ number_format(($project->status === 'Selesai' ? '100' : ($project->dailySafetyPatrol->count() / $period) * 100 ), 2) }}%</span>
                     </div>
 
                     <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">

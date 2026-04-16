@@ -7,6 +7,7 @@ use App\Models\DailySafetyPatrol;
 use App\Models\ProjectSafety;
 use App\Models\SafetyBriefing;
 use App\Models\Notification;
+use App\Models\Tool;
 
 class DashboardController extends Controller
 {
@@ -19,6 +20,11 @@ class DashboardController extends Controller
         $patrolWeekLast = DailySafetyPatrol::whereBetween('tanggal', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->count();
 
         $breafingWeekLast = SafetyBriefing::whereBetween('created_at', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->count();
+
+        $tools = Tool::all();
+        $toolsStock = Tool::sum('stock');
+
+        $projectSelesai = ProjectSafety::where('status', 'Selesai')->count();
 
         if ($patrolWeekLast == 0) {
             $patrolPercent = $patrolWeekNow > 0 ? 100 : 0;
@@ -36,12 +42,19 @@ class DashboardController extends Controller
 
         $breafingPercent = round($breafingPercent, 2);
 
-        $projectBerjalan = ProjectSafety::where('status', 'berjalan')->count();
+        $projectBerjalan = ProjectSafety::all()->count();
+
+        if ($projectBerjalan > 0) {
+            $projectPercentage = ($projectSelesai / $projectBerjalan) * 100;
+        } else {
+            $projectPercentage = 0;
+        }
+
 
         $notifs = Notification::where('is_read', false)->latest()->get();
 
         //dd($percent);
 
-        return view('pages.dashboard', compact(['patrolWeekNow', 'patrolPercent', 'breafingWeekNow', 'breafingPercent', 'projectBerjalan', 'notifs']));
+        return view('pages.dashboard', compact(['patrolWeekNow', 'patrolPercent', 'breafingWeekNow', 'breafingPercent', 'projectBerjalan', 'notifs', 'tools', 'toolsStock', 'projectPercentage']));
     }
 }

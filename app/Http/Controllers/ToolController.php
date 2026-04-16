@@ -64,11 +64,8 @@ class ToolController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'nullable|string|max:100',
             'stock' => 'required|integer|min:0',
-            'condition' => 'nullable|string|max:50',
-            'location' => 'nullable|string|max:100',
-            'notes' => 'nullable|string',
+            'stock_minimum' => 'required|integer|min:0'
         ]);
         $tool->update($data);
         return redirect()->route('tools.index')->with('success', 'Alat

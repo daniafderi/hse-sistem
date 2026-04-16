@@ -20,13 +20,13 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1" for="nama">Judul Project <span
                                 class="text-red-500">*</span></label>
                         <input name="nama" id="nama" type="text" placeholder="Masukkan judul project"
-                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm">
+                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" for="lokasi">Lokasi <span
                                 class="text-red-500">*</span></label>
                         <input type="text" placeholder="Masukkan lokasi project" name="lokasi" id="lokasi"
-                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm">
+                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm" required>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" for="status">Status <span
@@ -54,9 +54,10 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1" for="tanggal_mulai">Tanggal
-                            Mulai</label>
+                            Mulai <span
+                                class="text-red-500">*</span></label>
                         <input id="tanggal_mulai" name="tanggal_mulai" type="date"
-                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm">
+                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm" required>
                     </div>
 
                     <div>

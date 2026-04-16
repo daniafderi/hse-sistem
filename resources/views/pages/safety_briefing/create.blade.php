@@ -34,7 +34,8 @@
 
                 <!-- Deskripsi -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Briefing</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Briefing <span
+                                class="text-red-500">*</span></label>
                     <textarea name="catatan" rows="4" placeholder="Tuliskan poin penting briefing hari ini..."
                         class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm resize-none"></textarea>
                 </div>

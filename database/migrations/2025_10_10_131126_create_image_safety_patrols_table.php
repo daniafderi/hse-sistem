@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('image_safety_patrols', function (Blueprint $table) {
             $table->id();
-            $table->string('image_url');
+            $table->string('image_url')->nullable();
             $table->foreignId('daily_safety_patrol_id');
             $table->string('label');
             $table->string('text')->nullable();

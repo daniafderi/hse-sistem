@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 class Tool extends Model
 {
     protected $fillable =
-    ['name', 'stock'];
+    ['name', 'stock', 'stock_minimum'];
 
     public function loanItems()
     {

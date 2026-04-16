@@ -26,6 +26,14 @@
                         required>
                 </div>
 
+                <!-- Stok Minimum -->
+                <div class="flex flex-col">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Kebutuhan APD <span class="text-red-500">*</span></label>
+                    <input name="stock_minimum" type="number" min="0" value="{{ old('stock_minimum', 0) }}" placeholder="0"
+                        class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm"
+                        required>
+                </div>
+
             </div>
 
             <!-- Action Buttons -->

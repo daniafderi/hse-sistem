@@ -35,17 +35,9 @@
                 <div class="flex flex-col sm:flex-row gap-2">
                     <select
                         class="border border-gray-200 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2">
-                        <option>Semua Kategori</option>
-                        <option>APD</option>
-                        <option>Alat Berat</option>
-                        <option>Perkakas</option>
-                    </select>
-                    <select
-                        class="border border-gray-200 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2">
                         <option>Semua Status</option>
-                        <option>Aktif</option>
-                        <option>Rusak</option>
-                        <option>Dipinjam</option>
+                        <option>Aman</option>
+                        <option>Menipis</option>
                     </select>
                 </div>
             </div>
@@ -87,12 +79,12 @@
                                 </td>
 
                                 <td class="px-4 sm:px-6 py-4 text-center hidden md:table-cell">
-                                    @if ($tool['stock'] > 50)
-                                        <span class="badge bg-green-100 text-green-700">Aktif</span>
-                                    @elseif ($tool['stock'] >= 10)
-                                        <span class="badge bg-yellow-100 text-yellow-700">Menipis</span>
+                                    @if ($tool['stock'] > $tool['stock_minimum'] * 0.10)
+                                        <span class="px-2 py-1 rounded-full badge bg-green-100 text-green-700">Aman</span>
+                                    @elseif ($tool['stock'] <= $tool['stock_minimum'] * 0.10)
+                                        <span class="px-2 py-1 rounded-full badge bg-yellow-100 text-yellow-700">Menipis</span>
                                     @else
-                                        <span class="badge bg-rose-100 text-rose-700">Hampir Habis</span>
+                                        <span class="px-2 py-1 rounded-full badge bg-rose-100 text-rose-700">Hampir Habis</span>
                                     @endif
                                 </td>
 
@@ -165,7 +157,7 @@
                             <label @click="type = 'in'"
                                 :class="type === 'in' ? 'border-green-500 bg-green-50' : 'border-gray-200'"
                                 class="cursor-pointer border rounded-xl p-3 flex items-center gap-2 transition">
-                                <input type="radio" value="in" x-model="type" class="hidden">
+                                <input type="radio" value="in" x-model="type" class="hidden" name="type">
                                 <span class="text-green-600 text-lg">⬆</span>
                                 <div>
                                     <p class="font-medium text-gray-800">Stok Masuk</p>
@@ -177,7 +169,7 @@
                             <label @click="type = 'out'"
                                 :class="type === 'out' ? 'border-red-500 bg-red-50' : 'border-gray-200'"
                                 class="cursor-pointer border rounded-xl p-3 flex items-center gap-2 transition">
-                                <input type="radio" value="out" x-model="type" class="hidden">
+                                <input type="radio" value="out" x-model="type" class="hidden" name="type">
                                 <span class="text-red-600 text-lg">⬇</span>
                                 <div>
                                     <p class="font-medium text-gray-800">Stok Keluar</p>
@@ -193,7 +185,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Jumlah
                         </label>
-                        <input type="number" min="1"
+                        <input name="quantity" type="number" min="1"
                             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
                             placeholder="Masukkan jumlah">
                     </div>
@@ -203,7 +195,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Keterangan (opsional)
                         </label>
-                        <textarea class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" rows="2"
+                        <textarea name="note" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" rows="2"
                             placeholder="Contoh: pembelian baru / pemakaian proyek"></textarea>
                     </div>
 

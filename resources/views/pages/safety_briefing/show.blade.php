@@ -1,6 +1,5 @@
 <x-layouts.app title="Detail Briefing">
-    <div class="min-h-screen px-4 sm:px-6 py-6"
-        x-data="{ preview:false, imageSrc:'', openModalUpdate:false, confirmDelete:false }">
+    <div class="min-h-screen px-4 sm:px-6 py-6" x-data="{ preview: false, imageSrc: '', openModalUpdate: false, confirmDelete: false }">
 
         <div class="max-w-5xl mx-auto space-y-6">
 
@@ -64,7 +63,7 @@
                 <div class="flex items-center gap-4">
                     <div
                         class="w-12 h-12 rounded-full bg-indigo-500 text-white flex items-center justify-center font-semibold">
-                        {{ strtoupper(substr($safetyBriefing->user->name,0,1)) }}
+                        {{ strtoupper(substr($safetyBriefing->user->name, 0, 1)) }}
                     </div>
                     <div>
                         <p class="font-medium">{{ $safetyBriefing->user->name }}</p>
@@ -94,12 +93,11 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                     @forelse ($safetyBriefing->images as $image)
                         <div class="relative group cursor-pointer">
-                            <img src="{{ asset('storage/'.$image->image_url) }}"
+                            <img src="{{ asset('storage/' . $image->image_url) }}"
                                 class="rounded-lg object-cover w-full h-36 shadow">
 
-                            <div
-                                class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition rounded-lg"
-                                @click="imageSrc='{{ asset('storage/'.$image->image_url) }}'; preview=true">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition rounded-lg"
+                                @click="imageSrc='{{ asset('storage/' . $image->image_url) }}'; preview=true">
                                 Lihat Foto
                             </div>
                         </div>
@@ -147,11 +145,9 @@
                 </p>
 
                 <div class="flex justify-end gap-2">
-                    <button @click="confirmDelete=false"
-                        class="px-4 py-2 border rounded-lg">Batal</button>
+                    <button @click="confirmDelete=false" class="px-4 py-2 border rounded-lg">Batal</button>
 
-                    <form method="POST"
-                        action="{{ route('safety-briefing.destroy',$safetyBriefing->id) }}">
+                    <form method="POST" action="{{ route('safety-briefing.destroy', $safetyBriefing->id) }}">
                         @csrf
                         @method('DELETE')
                         <button class="px-4 py-2 bg-red-600 text-white rounded-lg">
@@ -159,6 +155,73 @@
                         </button>
                     </form>
                 </div>
+            </div>
+        </div>
+
+        <!-- MODAL UPDATE -->
+        <div x-show="openModalUpdate" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+            <div class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3 flex items-center">
+                    <i class="ri-clipboard-line text-indigo-600 text-2xl mr-2"></i>
+                    Perbarui Laporan Briefing
+                </h2>
+
+                <form class="space-y-8" action="{{ route('safety-briefing.update', $safetyBriefing->id) }}" method="post"
+                    enctype="multipart/form-data">
+                    @csrf
+                    @method('PATCH')
+
+                    <!-- Input Baris Pertama -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="tempat">Tempat <span
+                                    class="text-red-500">*</span></label>
+                            <input name="tempat" id="tempat" type="text" placeholder="Masukkan lokasi briefing"
+                                class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm" value="{{ $safetyBriefing->tempat }}"
+                                required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="pekerjaan">Pekerjaan <span
+                                    class="text-red-500">*</span></label>
+                            <input name="pekerjaan" id="pekerjaan" type="text" placeholder="Masukkan nama pekerjaan"
+                                class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm" value="{{ $safetyBriefing->pekerjaan }}"
+                                required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1" for="jumlah_peserta">Jumlah
+                                Peserta <span class="text-red-500">*</span></label>
+                            <input id="jumlah_peserta" name="jumlah_peserta" type="number" min="0"
+                                placeholder="0"
+                                class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm" value="{{ $safetyBriefing->jumlah_peserta }}"
+                                required>
+                        </div>
+                    </div>
+
+                    <!-- Deskripsi -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Catatan Briefing <span
+                                class="text-red-500">*</span></label>
+                        <textarea name="catatan" rows="4" placeholder="Tuliskan poin penting briefing hari ini..."
+                            class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm resize-none">{{ $safetyBriefing->catatan }}</textarea>
+                    </div>
+
+                    <!-- Upload Foto -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Upload Foto Dokumentasi</label>
+                        <x-input-multiple-files name="images[]"></x-input-multiple-files>
+                    </div>
+
+                    <!-- Tombol Submit -->
+                    <div class="flex justify-end pt-4 gap-2.5">
+                        <button @click="openModalUpdate=false"
+                            class="flex items-center gap-2 bg-white border border-gray-300 text-gray-600 hover:text-blue-600 hover:border-blue-400 px-4 py-2 rounded-lg text-sm shadow-sm transition" type="button">Batal</button>
+                        <button type="submit"
+                            class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md transition">
+                            <i class="ri-send-plane-line mr-2"></i> Submit
+                        </button>
+                    </div>
+
+                </form>
             </div>
         </div>
 
