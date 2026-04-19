@@ -31,8 +31,8 @@
             <!-- ================= FILTER ================= -->
             <div class="flex justify-between">
                 <a href="{{ route('download.template', ['file' => 'safety-briefing.pdf']) }}" download
-                    class="inline-flex items-center gap-2 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-blue-700 transition">
-                    <i class="ri-download-2-line text-sm"></i>
+                    class="inline-flex items-center gap-2 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
+                    <i class="ri-download-2-line text-xs"></i>
                     Download Form
                 </a>
                 <select onchange="location.href=this.value"

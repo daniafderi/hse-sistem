@@ -109,7 +109,7 @@
                             text-green-600
                         @else
                             text-red-600
-                        @endif font-semibold">{{ $historyStock['type'] === 'in' ? '+' : '-' . $historyStock['quantity']}}</div>
+                        @endif font-semibold">{{ $historyStock['type'] === 'in' ? '+' . $historyStock['quantity'] : '-' . $historyStock['quantity']}}</div>
                     </div>
                     @endforeach
                 </div>

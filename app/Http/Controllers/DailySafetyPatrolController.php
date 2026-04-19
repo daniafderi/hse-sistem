@@ -9,6 +9,7 @@ use App\Models\ProjectSafety;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
 
 class DailySafetyPatrolController extends Controller
 {
@@ -29,12 +30,15 @@ class DailySafetyPatrolController extends Controller
      */
     public function create()
     {
-        $projects = ProjectSafety::where('status', 'Berjalan')->get();
-        $permits = ['Gabungan', 'Ketinggian', 'Penggalian', 'Crane', 'Listrik'];
-        $users = User::all();
-        $today = Carbon::today()->toDateString();
+        if(Gate::allows('isHseLapangan')) {
+            $projects = ProjectSafety::where('status', 'Berjalan')->get();
+            $permits = ['Gabungan', 'Ketinggian', 'Penggalian', 'Crane', 'Listrik'];
+            $users = User::all();
+            $today = Carbon::today()->toDateString();
+    
+            return view('pages.safety_patrol.daily_report.create', compact(['projects', 'permits', 'today', 'users']));
 
-        return view('pages.safety_patrol.daily_report.create', compact(['projects', 'permits', 'today', 'users']));
+        }
     }
 
     /**

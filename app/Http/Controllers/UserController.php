@@ -37,6 +37,13 @@ class UserController extends Controller
     }
 
     public function show(User $user) {
-        return view('pages.user.show');
+
+        $totalProject = $user->projectPatrol()->count();
+
+        $totalReport = $user->dailyReport()->count();
+
+        $totalBriefing = $user->safetyBriefing()->count();
+
+        return view('pages.user.show', compact(['user', 'totalProject', 'totalReport', 'totalBriefing']));
     }
 }

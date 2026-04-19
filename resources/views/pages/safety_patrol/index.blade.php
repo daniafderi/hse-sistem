@@ -12,10 +12,13 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    @can('tambah-project')
                     <a href="{{ route('project.create') }}"
                         class="flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition">
                         <i class="ri-add-line"></i> Project Baru
                     </a>
+                        
+                    @endcan
 
                     <form action="{{ route('project.index') }}" method="get" class="relative w-full sm:w-56">
                         <input name="search" type="text" placeholder="Cari project..."

@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Illuminate\Support\Facades\Gate;
 
 class ProjectSafetyController extends Controller
 {
@@ -56,8 +57,11 @@ class ProjectSafetyController extends Controller
      */
     public function create()
     {
-        $statuses = ['Berjalan', 'Selesai', 'Dibatalkan', 'Dihentikan'];
-        return view('pages.safety_patrol.create', compact('statuses'));
+        if(Gate::allows('tambah-project')) {
+            $statuses = ['Berjalan', 'Selesai', 'Dibatalkan', 'Dihentikan'];
+            return view('pages.safety_patrol.create', compact('statuses'));
+
+        }
     }
 
     /**

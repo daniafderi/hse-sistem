@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/stock-transactions', [ToolStockHistoryController::class, 'store'])
     ->name('stock-transactions.store');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('/user', UserController::class);
+    Route::resource('/user', UserController::class)->middleware('can:isHseAdmin');
     Route::prefix('/safety-patrol')->group(function () {
         Route::resource('/project', ProjectSafetyController::class);
         Route::get('/project/{id}/export', [ProjectSafetyController::class, 'exportCsv'])->name('project.export.single');

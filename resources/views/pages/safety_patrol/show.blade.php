@@ -191,7 +191,7 @@
             </div>
 
             <!-- Download & Ekspor -->
-            <div class="bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div class="hidden bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-lg p-6 shadow-sm">
                 <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                     <i class="ri-download-cloud-2-line text-2xl text-blue-500 mr-2"></i>
                     Export & Download

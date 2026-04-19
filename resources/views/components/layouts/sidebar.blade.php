@@ -90,16 +90,19 @@
                 </div>
 
                 <!-- Briefing -->
+                @can('isHseAdmin')
                 <a href="{{ route('user.index') }}"
                     class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium 
                     {{ Request::routeIs('user.*') ? 'text-white bg-blue-600 ' : 'text-gray-700' }} hover:bg-indigo-50 hover:text-indigo-600 transition">
                     <i class="ri-user-line text-lg"></i> User
                 </a>
+                    
+                @endcan
 
                 <!-- Reports -->
-                <a href="#"
+                <a href="{{ route('export.index') }}"
                     class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium 
-                    text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition">
+                    {{ Request::routeIs('export.*') ? 'text-white bg-blue-600 ' : 'text-gray-700' }} hover:bg-indigo-50 hover:text-indigo-600 transition">
                     <i class="ri-bar-chart-line text-lg"></i> Reports
                 </a>
 

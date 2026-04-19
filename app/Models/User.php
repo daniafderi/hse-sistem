@@ -51,6 +51,10 @@ class User extends Authenticatable
     }
 
     public function safetyBriefing() {
-        return $this->belongsToMany(SafetyBriefing::class, 'user_safety_briefings');
+        return $this->hasMany(SafetyBriefing::class);
+    }
+
+    public function projectPatrol() {
+        return $this->hasMany(ProjectSafety::class);
     }
 }

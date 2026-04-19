@@ -42,7 +42,6 @@
                             <th class="py-3 px-4">User</th>
                             <th class="py-3 px-4">Email</th>
                             <th class="py-3 px-4">Role</th>
-                            <th class="py-3 px-4">Status</th>
                             <th class="py-3 px-4 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -75,27 +74,11 @@
                                     </span>
                                 </td>
 
-                                <td class="px-4 py-3">
-                                    <span
-                                        class="text-xs px-3 py-1 rounded-full
-                                        {{ $user->status
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-red-100 text-red-600' }}">
-                                        {{ $user->status ? 'Active' : 'Inactive' }}
-                                    </span>
-                                </td>
-
                                 <td class="px-4 py-3 text-right relative" x-data="{ open: false }">
-                                    <button @click="open = !open"
-                                        class="p-2 hover:bg-gray-200 rounded-lg">
-                                        <i class="ri-more-2-line text-lg"></i>
-                                    </button>
-
-                                    <div x-show="open" @click.outside="open=false"
-                                        class="absolute right-2 mt-2 w-40 bg-white shadow-lg border border-gray-200 rounded-xl z-20">
-                                        <a class="block px-4 py-2 text-sm hover:bg-gray-50">Edit</a>
-                                        <a class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Hapus</a>
-                                    </div>
+                                    <a href="{{ route('user.show', $user->id) }}"
+                                        class="inline-flex items-center gap-1 px-3 py-1.5 border rounded-lg text-indigo-600 hover:bg-indigo-600 hover:text-white transition">
+                                        <i class="ri-eye-line"></i> Detail
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach
