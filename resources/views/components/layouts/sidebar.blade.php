@@ -8,7 +8,7 @@
             <!-- Logo -->
             <div class="flex items-center gap-2 mb-6 px-3">
                 <i class="ri-shield-user-line text-2xl text-indigo-600"></i>
-                <h1 class="text-lg font-semibold text-gray-800">Safety<span class="text-indigo-600">Panel</span></h1>
+                <h1 class="text-lg font-semibold text-gray-800">Safe<span class="text-indigo-600">Gard</span></h1>
             </div>
 
             <div class="border-t border-gray-100 mb-3"></div>

@@ -8,6 +8,8 @@ use App\Models\ProjectSafety;
 use App\Models\SafetyBriefing;
 use App\Models\Notification;
 use App\Models\Tool;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -53,8 +55,29 @@ class DashboardController extends Controller
 
         $notifs = Notification::where('is_read', false)->latest()->get();
 
+        // ambil tanggal 7 hari terakhir
+    $dates = collect(range(0, 6))->map(function ($i) {
+        return Carbon::now()->subDays($i)->format('Y-m-d');
+    })->reverse()->values();
+
+    // ambil data dari DB
+    $data = DB::table('image_safety_patrols')
+        ->selectRaw('DATE(created_at) as date, label, COUNT(*) as total')
+        ->whereDate('created_at', '>=', Carbon::now()->subDays(6))
+        ->groupBy('date', 'label')
+        ->get();
+
+    // mapping data
+    $ua = [];
+    $uc = [];
+
+    foreach ($dates as $date) {
+        $ua[] = $data->where('date', $date)->where('label', 'ua')->sum('total');
+        $uc[] = $data->where('date', $date)->where('label', 'uc')->sum('total');
+    }
+
         //dd($percent);
 
-        return view('pages.dashboard', compact(['patrolWeekNow', 'patrolPercent', 'breafingWeekNow', 'breafingPercent', 'projectBerjalan', 'notifs', 'tools', 'toolsStock', 'projectPercentage']));
+        return view('pages.dashboard', compact(['patrolWeekNow', 'patrolPercent', 'breafingWeekNow', 'breafingPercent', 'projectBerjalan', 'notifs', 'tools', 'toolsStock', 'projectPercentage', 'ua', 'uc', 'dates']));
     }
 }

@@ -104,9 +104,14 @@
 
     @foreach ($dailyReport->images->where('label','ua') as $ua)
     <div class="flex flex-col md:flex-row gap-4 mb-4 bg-slate-50 p-4 rounded-lg border">
-        <div class="flex-1">
+        <div class="flex-1 text-sm">
+            <b class="mb-1">Deskripsi : </b>
             <p class="text-sm text-gray-700">
                 {{ $ua->text ?? 'Tidak ada deskripsi' }}
+            </p>
+            <b class="mb-1">Tindakan Perbaikan :</b>
+            <p class="text-sm text-gray-700">
+                {{ $ua->tindakan_perbaikan ?? 'Belum ada tindakan perbaikan' }}
             </p>
         </div>
         <div class="w-full md:w-48">
@@ -130,9 +135,14 @@
 
     @foreach ($dailyReport->images->where('label','uc') as $uc)
     <div class="flex flex-col md:flex-row gap-4 mb-4 bg-slate-50 p-4 rounded-lg border">
-        <div class="flex-1">
+        <div class="flex-1 text-sm">
+            <b class="mb-1">Deskripsi : </b>
             <p class="text-sm text-gray-700">
                 {{ $uc->text ?? 'Tidak ada deskripsi' }}
+            </p>
+            <b class="mb-1">Tindakan Perbaikan :</b>
+            <p class="text-sm text-gray-700">
+                {{ $uc->tindakan_perbaikan ?? 'Belum ada tindakan perbaikan' }}
             </p>
         </div>
         <div class="w-full md:w-48">

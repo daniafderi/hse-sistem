@@ -70,8 +70,8 @@ class DailySafetyPatrolController extends Controller
                     'text' => $item['text'] ?? null,
                     'image_url' => $imagePath,
                     'label' => 'ua',
-                    'status' => null,
-                    'tindakan_perbaikan' => null,
+                    'status' => $item['tindakan_perbaikan'] ? 'Selesai' : '',
+                    'tindakan_perbaikan' => $item['tindakan_perbaikan'] ?? '',
                 ]);
             }
         }
@@ -99,8 +99,8 @@ class DailySafetyPatrolController extends Controller
                     'text' => $item['text'] ?? null,
                     'image_url' => $imagePath,
                     'label' => 'uc',
-                    'status' => null,
-                    'tindakan_perbaikan' => null,
+                    'status' => $item['tindakan_perbaikan'] ? 'Selesai' : '',
+                    'tindakan_perbaikan' => $item['tindakan_perbaikan'] ?? '',
                 ]);
             }
         }

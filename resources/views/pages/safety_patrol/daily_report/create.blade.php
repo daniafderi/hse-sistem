@@ -105,6 +105,16 @@
                                     class="border border-slate-300 rounded-lg text-sm w-full p-2">
                             </div>
 
+                            <div class="mt-3">
+                                <label class="font-semibold text-sm block mb-1">
+                                    Tindakan Perbaikan #<span x-text="index + 1"></span>
+                                </label>
+
+                                <input type="text" 
+                                    :name="'unsafe_action[' + index + '][tindakan_perbaikan]'"
+                                    class="border border-slate-300 rounded-lg text-sm w-full p-2">
+                            </div>
+
                             <!-- Delete -->
                             <button type="button" class="mt-2 text-sm text-red-600 hover:underline"
                                 @click="unsafeActions.splice(index, 1)" x-show="unsafeActions.length > 0">
@@ -121,7 +131,7 @@
                     <!-- BUTTON ADD -->
                     <button type="button"
                         class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow text-sm hover:bg-indigo-700"
-                        @click="unsafeActions.push({ text: '', images: [] })">
+                        @click="unsafeActions.push({ text: '', images: [], tindakan_perbaikan: '' })">
                         + Tambah Unsafe Action
                     </button>
                 </div>
@@ -155,6 +165,16 @@
                                     class="border border-slate-300 rounded-lg text-sm w-full p-2">
                             </div>
 
+                            <div class="mt-3">
+                                <label class="font-semibold text-sm block mb-1">
+                                    Tindakan Perbaikan #<span x-text="index + 1"></span>
+                                </label>
+
+                                <input type="text" 
+                                    :name="'unsafe_condition[' + index + '][tindakan_perbaikan]'"
+                                    class="border border-slate-300 rounded-lg text-sm w-full p-2">
+                            </div>
+
                             <!-- Delete -->
                             <button type="button" class="mt-2 text-sm text-red-600 hover:underline"
                                 @click="unsafeConditions.splice(index, 1)" x-show="unsafeConditions.length > 0">
@@ -171,7 +191,7 @@
                     <!-- BUTTON ADD -->
                     <button type="button"
                         class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow text-sm hover:bg-indigo-700"
-                        @click="unsafeConditions.push({ text: '', images: [] })">
+                        @click="unsafeConditions.push({ text: '', images: [], tindakan_perbaikan: '' })">
                         + Tambah Unsafe Condition
                     </button>
                 </div>

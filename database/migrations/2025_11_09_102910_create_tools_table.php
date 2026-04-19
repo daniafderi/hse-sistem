@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('stock')->default(0);
             $table->integer('stock_minimum')->default(0);
+            $table->string('satuan')->default('pcs')->nullable();
             $table->timestamps();
         });
     }

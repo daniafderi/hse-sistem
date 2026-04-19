@@ -13,7 +13,7 @@
                     <i class="ri-line-chart-line mr-1"></i> Grafik Stok
                 </button>
     
-                <button class="px-4 py-2 bg-amber-500 text-white text-sm rounded-lg shadow hover:bg-amber-400">
+                <button class="hidden px-4 py-2 bg-amber-500 text-white text-sm rounded-lg shadow hover:bg-amber-400">
                     <i class="ri-hand-coin-line mr-1"></i> Pinjam APD
                 </button>
     
@@ -24,6 +24,11 @@
                 <button class="hidden px-4 py-2 bg-emerald-600 text-white text-sm rounded-lg shadow hover:bg-emerald-500">
                     <i class="ri-download-line mr-1"></i> Download
                 </button>
+
+                <a href="{{ route('tools.index') }}"
+           class="flex items-center gap-2 bg-white border border-gray-300 text-gray-600 hover:text-indigo-600 hover:border-indigo-400 px-4 py-2 rounded-lg text-sm shadow-sm transition w-full sm:w-auto justify-center">
+            <i class="ri-arrow-left-line"></i> Kembali
+        </a>
             </div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -35,9 +40,13 @@
                     </div>
     
                     {{-- STOCK WARNING --}}
-                    <span class="px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-                        Stok Minimum
-                    </span>
+                    @if ($tool['stock'] > $tool['stock_minimum'] * 0.10)
+                                        <span class="text-xs font-semibold px-2 py-1 rounded-full badge bg-green-100 text-green-700">Stock Aman</span>
+                                    @elseif ($tool['stock'] <= $tool['stock_minimum'] * 0.10)
+                                        <span class="text-xs font-semibold px-2 py-1 rounded-full badge bg-yellow-100 text-yellow-700">Menipis</span>
+                                    @else
+                                        <span class="text-xs font-semibold px-2 py-1 rounded-full badge bg-rose-100 text-rose-700">Hampir Habis</span>
+                                    @endif
                 </div>
     
                 <div class="space-y-3 text-sm">
@@ -60,7 +69,7 @@
     
                     <div class="flex justify-between">
                         <span class="text-gray-500">Stok Minimum</span>
-                        <span class="text-gray-800">5</span>
+                        <span class="text-gray-800">{{ $tool['stock_minimum'] * 0.10 }}</span>
                     </div>
     
                     <div class="flex justify-between">
@@ -83,25 +92,26 @@
                 </div>
     
                 <div class="space-y-3 max-h-[360px] overflow-y-auto">
-                    {{-- STOCK MASUK --}}
-                    <div class="flex items-start gap-3 border rounded-lg p-3">
-                        <i class="ri-arrow-up-line text-green-600"></i>
+                    @foreach ($tool->stockTransaction as $historyStock)
+                        <div class="flex items-start gap-3 border rounded-lg p-3">
+                            @if ($historyStock['type'] === 'in')
+                            <i class="ri-arrow-up-line text-green-600"></i>
+                            
+                            @else
+                            <i class="ri-arrow-down-line text-red-600"></i>
+                                
+                            @endif
                         <div class="flex-1 text-sm">
-                            <p class="font-medium text-gray-800">Penambahan stok APD</p>
-                            <p class="text-xs text-gray-500">01 Jan 2025 • Admin</p>
+                            <p class="font-medium text-gray-800">{{ $historyStock['note'] }}</p>
+                            <p class="text-xs text-gray-500">{{ $historyStock['created_at'] }} • Sistem</p>
                         </div>
-                        <div class="text-green-600 font-semibold">+10</div>
+                        <div class="@if ($historyStock['type'] === 'in')
+                            text-green-600
+                        @else
+                            text-red-600
+                        @endif font-semibold">{{ $historyStock['type'] === 'in' ? '+' : '-' . $historyStock['quantity']}}</div>
                     </div>
-    
-                    {{-- STOCK KELUAR --}}
-                    <div class="flex items-start gap-3 border rounded-lg p-3">
-                        <i class="ri-arrow-down-line text-red-600"></i>
-                        <div class="flex-1 text-sm">
-                            <p class="font-medium text-gray-800">Pengurangan karena peminjaman</p>
-                            <p class="text-xs text-gray-500">03 Jan 2025 • Sistem</p>
-                        </div>
-                        <div class="text-red-600 font-semibold">-7</div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -123,19 +133,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y">
-                        <tr>
-                            <td class="px-4 py-2">Budi Santoso</td>
-                            <td class="text-center">2</td>
-                            <td>02 Jan 2025</td>
-                            <td>-</td>
-                            <td class="text-center">
-                                <span class="px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-700">
-                                    Dipinjam
-                                </span>
-                            </td>
-                        </tr>
-
-                        
+  
                         @if ($tool->loanItems->count() > 0)
                             @foreach ($tool->loanItems as $item)
                                 <tr>
@@ -150,6 +148,8 @@
                             </td>
                         </tr>
                             @endforeach
+                            @else
+                            <tr><td class="px-4 py-3 text-center" colspan="6">Belum ada data peminjaman</td></tr>
                         @endif
                     </tbody>
                 </table>

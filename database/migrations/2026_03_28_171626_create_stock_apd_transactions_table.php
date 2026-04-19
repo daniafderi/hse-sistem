@@ -17,6 +17,7 @@ return new class extends Migration
             $table->enum('type', ['in', 'out']);
             $table->integer('quantity');
             $table->text('note')->nullable();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

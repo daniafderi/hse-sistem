@@ -1,5 +1,5 @@
 <x-layouts.app title="Detail Briefing">
-    <div class="min-h-screen px-4 sm:px-6 py-6" x-data="{ preview: false, imageSrc: '', openModalUpdate: false, confirmDelete: false }">
+    <div class="min-h-screen py-6" x-data="{ preview: false, imageSrc: '', openModalUpdate: false, confirmDelete: false }">
 
         <div class="max-w-5xl mx-auto space-y-6">
 
@@ -160,7 +160,7 @@
 
         <!-- MODAL UPDATE -->
         <div x-show="openModalUpdate" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-            <div class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-8">
+            <div class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-8 h-[-webkit-fill-available] overflow-y-scroll">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3 flex items-center">
                     <i class="ri-clipboard-line text-indigo-600 text-2xl mr-2"></i>
                     Perbarui Laporan Briefing
@@ -208,7 +208,7 @@
                     <!-- Upload Foto -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Upload Foto Dokumentasi</label>
-                        <x-input-multiple-files name="images[]"></x-input-multiple-files>
+                        <x-input-multiple-files name="new_photos[]" :existing="$safetyBriefing->images"/>
                     </div>
 
                     <!-- Tombol Submit -->

@@ -44,7 +44,7 @@ class ToolController extends Controller
      */
     public function show(Tool $tool)
     {
-        $tool->load(['loanItems']);
+        $tool->load(['loanItems', 'stockTransaction']);
 
         return view('pages.tool.show', compact('tool'));
     }

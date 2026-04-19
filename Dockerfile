@@ -25,7 +25,8 @@ RUN npm run build
 
 RUN chmod -R 775 storage bootstrap/cache
 
-CMD php artisan config:clear && \
+CMD php artisan storage:link && \
+    php artisan config:clear && \
     php artisan cache:clear && \
     php artisan config:cache && \
     php artisan migrate --force && \

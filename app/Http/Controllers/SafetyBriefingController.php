@@ -7,6 +7,7 @@ use App\Models\ImageSafetyBriefing;
 use App\Models\SafetyBriefing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SafetyBriefingController extends Controller
 {
@@ -99,6 +100,8 @@ class SafetyBriefingController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        //dd($request->existing_images);
         $briefing = SafetyBriefing::with('images')->findOrFail($id);
 
         // ===========================
@@ -110,11 +113,8 @@ class SafetyBriefingController extends Controller
             'jumlah_peserta'    => 'required|integer|min:0',
             'catatan'           => 'nullable|string',
 
-            'deleted_photos'    => 'array',
-            'deleted_photos.*'  => 'integer',
-
-            'existing_photos'   => 'array',
-            'existing_photos.*' => 'integer',
+            'existing_images'   => 'array',
+            'existing_images.*' => 'integer',
 
             'new_photos.*'      => 'image|max:2048',
         ]);
@@ -129,16 +129,20 @@ class SafetyBriefingController extends Controller
             'catatan'         => $request->catatan,
         ]);
 
-        // ===========================
-        // HAPUS FOTO LAMA
-        // ===========================
-        if ($request->deleted_photos) {
-            foreach ($request->deleted_photos as $photoId) {
-                $photo = ImageSafetyBriefing::find($photoId);
-                if ($photo) {
-                    Storage::disk('public')->delete($photo->image_url);
-                    $photo->delete();
-                }
+        // ambil semua id foto yang ada di DB
+        $currentPhotoIds = $briefing->images->pluck('id')->toArray();
+
+        // ambil dari request (yang masih dipakai)
+        $existingPhotoIds = $request->existing_images ?? [];
+
+        // cari yang harus dihapus
+        $photosToDelete = array_diff($currentPhotoIds, $existingPhotoIds);
+
+        foreach ($photosToDelete as $photoId) {
+            $photo = ImageSafetyBriefing::find($photoId);
+            if ($photo) {
+                Storage::disk('public')->delete($photo->image_url);
+                $photo->delete();
             }
         }
 
@@ -168,5 +172,16 @@ class SafetyBriefingController extends Controller
         $safetyBriefing->delete();
 
         return redirect()->route('safety-briefing.index')->with('success', 'Berhasil menghapus safety briefing');
+    }
+
+    public function download($file)
+    {
+        $path = storage_path('app/templates/' . $file);
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->download($path);
     }
 }

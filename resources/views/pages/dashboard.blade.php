@@ -85,15 +85,10 @@
                     <!-- Grafik -->
                     <div class="bg-white rounded-xl p-5 shadow-sm border">
                         <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-lg font-semibold text-gray-800">Trend Laporan Safety Patrol</h3>
-                            <select class="text-sm border rounded-lg px-2 py-1 focus:ring-blue-500">
-                                <option>Mingguan</option>
-                                <option>Bulanan</option>
-                                <option>Tahunan</option>
-                            </select>
+                            <h3 class="text-lg font-semibold text-gray-800">Unsafe Action & Unsafe Condition</h3>
                         </div>
-                        <div class="h-56 flex items-center justify-center text-gray-400 text-sm">
-                            (📈 Area Chart Placeholder)
+                        <div class="h-[400px] flex items-center justify-center text-gray-400 text-sm">
+                            <canvas id='myChart'></canvas>
                         </div>
                     </div>
     
@@ -130,29 +125,21 @@
                 <div class="space-y-8">
                     <!-- Progress Section -->
                     <div class="bg-white rounded-xl p-5 shadow-sm border">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Progress Kepatuhan</h3>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-3">Status APD</h3>
                         <div class="space-y-4">
-                            <div>
-                                <p class="text-sm text-gray-600 mb-1">Patroli</p>
+                            @foreach ($tools as $tool)
+                                <div>
+                                <p class="text-sm text-gray-600 mb-1">{{ $tool->name }}</p>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-blue-500 h-2 rounded-full w-[82%]"></div>
+                                    <div class="@if ($tool['stock'] > $tool['stock_minimum'] * 0.10)
+                                        bg-green-600
+                                    @else
+                                        bg-red-600
+                                    @endif h-2 rounded-full" style="width: {{ ($tool->stock / $tool->stock_minimum) * 100 }}%"></div>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1">82% tercapai</p>
+                                <p class="text-xs text-gray-500 mt-1">{{ $tool->stock }}/{{ $tool->stock_minimum }} stock tersisa</p>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-600 mb-1">Briefing</p>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full w-[68%]"></div>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1">68% tercapai</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600 mb-1">Pemakaian APD</p>
-                                <div class="w-full bg-gray-200 rounded-full h-2">
-                                    <div class="bg-yellow-500 h-2 rounded-full w-[90%]"></div>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1">90% kepatuhan</p>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
     
@@ -176,4 +163,35 @@
             </div>
         </div>
     </div>
+    <script>
+    new Chart(document.getElementById('myChart'), {
+    type: 'bar', // 🔥 ini kuncinya (diagram batang)
+    data: {
+        labels: @json($dates),
+        datasets: [
+            {
+                label: 'Unsafe Action',
+                data: @json($ua),
+                backgroundColor: 'rgba(255, 99, 132, 0.7)'
+            },
+            {
+                label: 'Unsafe Condition',
+                data: @json($uc),
+                backgroundColor: 'rgba(255, 159, 64, 0.7)'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0 // biar angka bulat
+                }
+            }
+        }
+    }
+});
+</script>
 </x-layouts.app>

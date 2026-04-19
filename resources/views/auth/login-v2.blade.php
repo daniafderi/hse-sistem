@@ -30,7 +30,7 @@
               A
             </div>
             <div>
-              <h1 class="text-2xl font-semibold text-gray-800">AppName</h1>
+              <h1 class="text-2xl font-semibold text-gray-800">Safe<span class="text-indigo-600">Gard</span></h1>
               <p class="text-sm text-gray-500">Solusi laporan harian & kolaborasi tim</p>
             </div>
           </a>
