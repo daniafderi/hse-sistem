@@ -33,7 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::prefix('/safety-patrol')->group(function () {
         Route::resource('/project', ProjectSafetyController::class);
         Route::get('/project/{id}/export', [ProjectSafetyController::class, 'exportCsv'])->name('project.export.single');
-        Route::resource('/daily-report', DailySafetyPatrolController::class);
+        Route::resource('/daily-report', DailySafetyPatrolController::class)->parameters([
+        'daily-report' => 'dailySafetyPatrol'
+    ]);
         Route::post(
             '/daily-report/{report}/validate',
             [ValidationSafetyPatrolController::class, 'store']

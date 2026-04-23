@@ -14,6 +14,27 @@ class DailySafetyPatrol extends Model
     protected $fillable = ['project_safety_id','tanggal','permit','jam_kerja','jumlah_pekerja','reward','nearmiss','punishment','kecelakaan','deskripsi', 'status_validasi'];
     public $timestamps = true;
 
+    protected static function booted()
+{
+    static::updating(function ($model) {
+
+        // 🔥 hanya ubah status kalau ada perubahan data penting
+        if ($model->isDirty([
+            'project_safety_id',
+            'tanggal',
+            'permit',
+            'jumlah_pekerja',
+            'jam_kerja',
+            'deskripsi',
+            'nearmiss',
+            'punishment',
+            'kecelakaan'
+        ])) {
+            $model->status_validasi = 'menunggu validasi';
+        }
+    });
+}
+
     public function project() {
         return $this->belongsTo(ProjectSafety::class, 'project_safety_id');
     }

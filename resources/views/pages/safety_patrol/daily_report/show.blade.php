@@ -23,10 +23,18 @@
     </div>
 
     <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        @can('isSupervisor')
         <button @click="openModal = true"
             class="w-full sm:w-auto px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-lg shadow text-sm">
             <i class="ri-check-line"></i> Validasi
         </button>
+            
+        @endcan
+
+        <a href="{{ route('daily-report.edit', $dailyReport) }}"
+           class="flex items-center gap-2 bg-white border border-gray-300 text-gray-600 hover:text-indigo-600 hover:border-indigo-400 px-4 py-2 rounded-lg text-sm shadow-sm transition w-full sm:w-auto justify-center">
+            <i class="ri-edit-line"></i> Edit
+        </a>
 
         <a href="{{ route('daily-report.index') }}"
            class="flex items-center gap-2 bg-white border border-gray-300 text-gray-600 hover:text-indigo-600 hover:border-indigo-400 px-4 py-2 rounded-lg text-sm shadow-sm transition w-full sm:w-auto justify-center">

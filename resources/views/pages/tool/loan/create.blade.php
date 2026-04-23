@@ -1,5 +1,5 @@
 <x-layouts.app title="Peminjaman">
-    <div class="bg-white p-8 rounded-lg shadow-lg mx-auto">
+    <div class="bg-white p-8 rounded-lg shadow-lg">
         <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
             <i class="ri-archive-line text-indigo-600"></i>
             Form Peminjaman
@@ -40,7 +40,8 @@
 
                         <!-- Tombol Hapus -->
                         <button type="button" @click="remove(idx)"
-                            class="col-span-3 flex items-center justify-center px-3 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition">
+                            :disabled="items.length <= 1"
+                            class="col-span-3 flex items-center justify-center px-3 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed">
                             <i class="ri-delete-bin-line text-lg"></i>
                             <span class="ml-1">Hapus</span>
                         </button>

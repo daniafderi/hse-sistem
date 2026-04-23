@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\DailySafetyPatrol;
 use App\Models\ValidationSafetyPatrol;
 use Illuminate\Http\Request;
+use App\Models\Notification;
+use App\Models\User;
 
 class ValidationSafetyPatrolController extends Controller
 {
@@ -49,6 +51,20 @@ class ValidationSafetyPatrolController extends Controller
         $report->update([
             'status_validasi' => $request->status,
         ]);
+
+        $notif = Notification::create([
+    'type' => 'report_validate',
+    'title' => 'Laporan divalidasi',
+    'message' => 'Laporan telah divalidasi',
+    'notifiable_id' => $report->id,
+    'notifiable_type' => DailySafetyPatrol::class,
+    'created_by' => auth()->id()
+]);
+
+$users = User::whereIn('role', ['hselapangan', 'supervisor'])->pluck('id');
+
+// kirim ke user tertentu
+$notif->users()->attach($users);
     
         return back()->with('toast_success', 'Validasi berhasil disimpan.');
     }

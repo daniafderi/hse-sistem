@@ -6,19 +6,53 @@ use App\Http\Requests\DailySafetyPatrolRequest;
 use App\Models\DailySafetyPatrol;
 use App\Models\ImageSafetyPatrol;
 use App\Models\ProjectSafety;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class DailySafetyPatrolController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $datas = DailySafetyPatrol::orderBy('created_at', 'desc')->paginate(5);
+        $query = DailySafetyPatrol::with('project');
+
+        // ============================
+        // 1. Filter Status
+        // ============================
+        if ($request->status && $request->status !== 'semua') {
+            $query->where('status_validasi', $request->status);
+        }
+
+        // ============================
+        // 2. Pencarian
+        // ============================
+        if ($request->search) {
+            $keyword = $request->search;
+
+            $query->where(function ($q) use ($keyword) {
+                $q->whereHas('project', function ($q2) use ($keyword) {
+                    $q2->where('nama', 'like', '%' . $keyword . '%'); // dari tabel project
+                });
+            });
+        }
+
+        // ============================
+        // 3. Sorting (Urutkan)
+        // terbaru = desc, terlama = asc
+        // ============================
+        if ($request->sort === 'terlama') {
+            $query->orderBy('created_at', 'asc');
+        } else {
+            $query->orderBy('created_at', 'desc'); // default terbaru
+        }
+
+        $datas = $query->paginate(10)->withQueryString();
 
         //dd($datas);
 
@@ -30,14 +64,13 @@ class DailySafetyPatrolController extends Controller
      */
     public function create()
     {
-        if(Gate::allows('isHseLapangan')) {
+        if (Gate::allows('isHseLapangan')) {
             $projects = ProjectSafety::where('status', 'Berjalan')->get();
             $permits = ['Gabungan', 'Ketinggian', 'Penggalian', 'Crane', 'Listrik'];
             $users = User::all();
             $today = Carbon::today()->toDateString();
-    
-            return view('pages.safety_patrol.daily_report.create', compact(['projects', 'permits', 'today', 'users']));
 
+            return view('pages.safety_patrol.daily_report.create', compact(['projects', 'permits', 'today', 'users']));
         }
     }
 
@@ -119,6 +152,20 @@ class DailySafetyPatrolController extends Controller
 
         $patrol->users()->sync($userIds);
 
+        $notif = Notification::create([
+    'type' => 'report_created',
+    'title' => 'Laporan Baru',
+    'message' => 'Laporan baru telah dibuat',
+    'notifiable_id' => $patrol->id,
+    'notifiable_type' => DailySafetyPatrol::class,
+    'created_by' => auth()->id()
+]);
+
+$users = User::whereIn('role', ['hselapangan', 'supervisor'])->pluck('id');
+
+// kirim ke user tertentu
+$notif->users()->attach($users);
+
         return redirect()
             ->route('daily-report.index')
             ->with('success', 'Berhasil menambah laporan');
@@ -128,11 +175,11 @@ class DailySafetyPatrolController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(DailySafetyPatrol $dailyReport)
+    public function show(DailySafetyPatrol $dailySafetyPatrol)
     {
 
 
-        $dailyReport->load(['images', 'users']);
+        $dailyReport = $dailySafetyPatrol->load(['images', 'users']);
 
         //dd($dailyReport);
 
@@ -144,15 +191,123 @@ class DailySafetyPatrolController extends Controller
      */
     public function edit(DailySafetyPatrol $dailySafetyPatrol)
     {
-        //
+        if (Gate::allows('isHseLapangan')) {
+            $projects = ProjectSafety::where('status', 'Berjalan')->get();
+            $permits = ['Gabungan', 'Ketinggian', 'Penggalian', 'Crane', 'Listrik'];
+            $users = User::all();
+            $today = Carbon::today()->toDateString();
+            $report = $dailySafetyPatrol->load('images');
+            $unsafeActions = $report->images->where('label', 'ua')->values();
+            $unsafeConditions = $report->images->where('label', 'uc')->values();
+            //dd($report->toArray());
+
+            return view('pages.safety_patrol.daily_report.edit', compact(['projects', 'permits', 'today', 'users', 'report', 'unsafeActions', 'unsafeConditions']));
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, DailySafetyPatrol $dailySafetyPatrol)
+    public function update(DailySafetyPatrolRequest $request, DailySafetyPatrol $dailySafetyPatrol)
     {
-        //
+        $dailySafety = $request->validated();
+
+        // ===============================
+        // 1. Update data utama
+        // ===============================
+        $dailySafetyPatrol->update($dailySafety);
+
+        // ===============================
+        // 2. Hapus data lama (UA & UC)
+        // ===============================
+
+        // ambil semua image lama
+$existingImages = $dailySafetyPatrol->images->keyBy('id');
+
+// reset dulu (opsional kalau mau full replace)
+$dailySafetyPatrol->images()->delete();
+if ($request->has('unsafe_action')) {
+
+    foreach ($request->unsafe_action as $item) {
+    
+        if (
+            empty(trim($item['text'] ?? '')) &&
+            empty($item['images'][0] ?? null)
+        ) {
+            continue;
+        }
+    
+        $imagePath = $item['old_image'] ?? null; // 🔥 pakai image lama
+    
+        // kalau ada upload baru → replace
+        if (!empty($item['images'][0])) {
+    
+            // hapus file lama
+            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+    
+            $imagePath = $item['images'][0]->store('safety_patrol', 'public');
+        }
+    
+        ImageSafetyPatrol::create([
+            'daily_safety_patrol_id' => $dailySafetyPatrol->id,
+            'text' => $item['text'] ?? null,
+            'image_url' => $imagePath,
+            'label' => 'ua',
+            'status' => !empty($item['tindakan_perbaikan']) ? 'Selesai' : '',
+            'tindakan_perbaikan' => $item['tindakan_perbaikan'] ?? '',
+        ]);
+    }
+}
+if ($request->has('unsafe_condition')) {
+
+    foreach ($request->unsafe_condition as $item) {
+    
+        if (
+            empty(trim($item['text'] ?? '')) &&
+            empty($item['images'][0] ?? null)
+        ) {
+            continue;
+        }
+    
+        $imagePath = $item['old_image'] ?? null; // 🔥 pakai image lama
+    
+        // kalau ada upload baru → replace
+        if (!empty($item['images'][0])) {
+    
+            // hapus file lama
+            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+    
+            $imagePath = $item['images'][0]->store('safety_patrol', 'public');
+        }
+    
+        ImageSafetyPatrol::create([
+            'daily_safety_patrol_id' => $dailySafetyPatrol->id,
+            'text' => $item['text'] ?? null,
+            'image_url' => $imagePath,
+            'label' => 'uc',
+            'status' => !empty($item['tindakan_perbaikan']) ? 'Selesai' : '',
+            'tindakan_perbaikan' => $item['tindakan_perbaikan'] ?? '',
+        ]);
+    }
+}
+
+        // ===============================
+        // 5. Sync Users
+        // ===============================
+        $userIds = array_unique(array_merge(
+            [$request->user()->id],
+            $dailySafety['users'] ?? []
+        ));
+
+        $dailySafetyPatrol->users()->sync($userIds);
+
+        return redirect()
+            ->route('daily-report.index')
+            ->with('success', 'Berhasil update laporan');
     }
 
     /**

@@ -52,9 +52,6 @@ class DashboardController extends Controller
             $projectPercentage = 0;
         }
 
-
-        $notifs = Notification::where('is_read', false)->latest()->get();
-
         // ambil tanggal 7 hari terakhir
     $dates = collect(range(0, 6))->map(function ($i) {
         return Carbon::now()->subDays($i)->format('Y-m-d');
@@ -78,6 +75,6 @@ class DashboardController extends Controller
 
         //dd($percent);
 
-        return view('pages.dashboard', compact(['patrolWeekNow', 'patrolPercent', 'breafingWeekNow', 'breafingPercent', 'projectBerjalan', 'notifs', 'tools', 'toolsStock', 'projectPercentage', 'ua', 'uc', 'dates']));
+        return view('pages.dashboard', compact(['patrolWeekNow', 'patrolPercent', 'breafingWeekNow', 'breafingPercent', 'projectBerjalan', 'tools', 'toolsStock', 'projectPercentage', 'ua', 'uc', 'dates']));
     }
 }

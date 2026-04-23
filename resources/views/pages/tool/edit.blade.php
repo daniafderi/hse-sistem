@@ -2,18 +2,19 @@
     <div class="bg-white p-8 rounded-lg shadow-lg border">
         <h2 class="text-2xl font-semibold mb-6 pb-3 border-b text-gray-800 flex items-center gap-2">
             <i class="ri-tools-line text-blue-600 text-2xl"></i>
-            Tambah Alat Baru
+            Edit Alat
         </h2>
 
-        <form action="{{ route('tools.store') }}" method="POST">
+        <form action="{{ route('tools.update', $tool) }}" method="POST">
             @csrf
+            @method('PUT')
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
                 <!-- Nama Alat -->
                 <div class="flex flex-col">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama Alat <span class="text-red-500">*</span></label>
-                    <input name="name" value="{{ old('name') }}" type="text" placeholder="Contoh: Helm Safety"
+                    <input name="name" value="{{ old('name', $tool->name) }}" type="text" placeholder="Contoh: Helm Safety"
                         class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm"
                         required>
                 </div>
@@ -21,7 +22,7 @@
                 <!-- Stok -->
                 <div class="flex flex-col">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Stok <span class="text-red-500">*</span></label>
-                    <input name="stock" type="number" min="0" value="{{ old('stock', 0) }}" placeholder="0"
+                    <input name="stock" type="number" min="0" value="{{ old('stock', $tool->stock) }}" placeholder="0"
                         class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm"
                         required>
                 </div>
@@ -29,7 +30,7 @@
                 <!-- Stok Minimum -->
                 <div class="flex flex-col">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Jumlah Kebutuhan APD Pertahun<span class="text-red-500">*</span></label>
-                    <input name="stock_minimum" type="number" min="0" value="{{ old('stock_minimum', 0) }}" placeholder="0"
+                    <input name="stock_minimum" type="number" min="0" value="{{ old('stock_minimum', $tool->stock_minimum) }}" placeholder="0"
                         class="w-full border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 rounded-lg shadow-sm"
                         required>
                 </div>

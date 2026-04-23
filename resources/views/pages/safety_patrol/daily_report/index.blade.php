@@ -20,11 +20,12 @@
                         <i class="ri-add-line"></i> Laporan Baru
                     </a>
 
-                    <div class="relative w-full sm:w-56">
-                        <input type="text" placeholder="Cari laporan..."
+                    <form action="{{ route('daily-report.index') }}" method="GET" class="relative w-full sm:w-56">
+                        <input name="search" type="text"
+                            value="{{ request()->search }}" placeholder="Cari laporan..."
                             class="w-full pl-9 pr-4 py-2 border rounded-lg text-sm border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                         <i class="ri-search-line absolute left-3 top-2 text-gray-400"></i>
-                    </div>
+                    </form>
                 </div>
             </div>
 
@@ -32,30 +33,37 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
 
                 <!-- Filter Scroll -->
-                <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
-                    <button
-                        class="whitespace-nowrap border border-gray-300 text-gray-600 hover:text-indigo-600 hover:border-indigo-400 px-3 py-1.5 rounded-lg text-sm transition">
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ request()->fullUrlWithQuery(['status' => 'semua']) }}"
+                        class="px-3 py-1.5 text-sm rounded-lg border text-gray-600 hover:border-indigo-400 hover:text-indigo-600">
                         Semua
-                    </button>
-                    <button class="whitespace-nowrap bg-green-50 text-green-700 border border-green-200 px-3 py-1.5 rounded-lg text-sm">
-                        Divalidasi
-                    </button>
-                    <button class="whitespace-nowrap bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg text-sm">
+                    </a>
+
+                    <a href="{{ request()->fullUrlWithQuery(['status' => 'valid']) }}"
+                        class="px-3 py-1.5 text-sm rounded-lg bg-green-50 text-green-700 border border-green-200">
+                        Valid
+                    </a>
+
+                    <a href="{{ request()->fullUrlWithQuery(['status' => 'menunggu validasi']) }}"
+                        class="px-3 py-1.5 text-sm rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
                         Menunggu
-                    </button>
-                    <button class="whitespace-nowrap bg-yellow-50 text-yellow-700 border border-yellow-200 px-3 py-1.5 rounded-lg text-sm">
+                    </a>
+
+                    <a href="{{ request()->fullUrlWithQuery(['status' => 'revisi']) }}"
+                        class="px-3 py-1.5 text-sm rounded-lg bg-yellow-50 text-yellow-700 border border-yellow-200">
                         Revisi
-                    </button>
-                    <button class="whitespace-nowrap bg-red-50 text-red-700 border border-red-200 px-3 py-1.5 rounded-lg text-sm">
+                    </a>
+
+                    <a href="{{ request()->fullUrlWithQuery(['status' => 'ditolak']) }}"
+                        class="px-3 py-1.5 text-sm rounded-lg bg-yellow-50 text-red-700 border border-red-200">
                         Ditolak
-                    </button>
+                    </a>
                 </div>
 
-                <select
-                    class="border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 w-full sm:w-auto">
-                    <option>Urutkan: Terbaru</option>
-                    <option>Urutkan: Tertua</option>
-                    <option>Urutkan: Status</option>
+                <select onchange="location.href=this.value"
+                    class="w-full md:w-auto border border-gray-300 rounded-lg text-sm px-3 py-2 focus:ring-indigo-500">
+                    <option value="{{ request()->fullUrlWithQuery(['sort' => 'terbaru']) }}" @if(request()->sort == 'terbaru') selected @endif>Urutkan: Terbaru</option>
+                    <option value="{{ request()->fullUrlWithQuery(['sort' => 'terlama']) }}" @if(request()->sort == 'terlama') selected @endif>Urutkan: Terlama</option>
                 </select>
             </div>
 

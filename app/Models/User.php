@@ -46,15 +46,25 @@ class User extends Authenticatable
         ];
     }
 
-    public function dailyReport() {
+    public function dailyReport()
+    {
         return $this->belongsToMany(DailySafetyPatrol::class, 'user_daily_safety_patrols');
     }
 
-    public function safetyBriefing() {
+    public function safetyBriefing()
+    {
         return $this->hasMany(SafetyBriefing::class);
     }
 
-    public function projectPatrol() {
+    public function projectPatrol()
+    {
         return $this->hasMany(ProjectSafety::class);
+    }
+
+    public function notifications()
+    {
+        return $this->belongsToMany(Notification::class, 'notification_users')
+            ->withPivot('is_read', 'read_at')
+            ->withTimestamps();
     }
 }

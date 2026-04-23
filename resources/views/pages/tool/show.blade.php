@@ -25,6 +25,11 @@
                     <i class="ri-download-line mr-1"></i> Download
                 </button>
 
+                <a href="{{ route('tools.edit', $tool) }}"
+           class="flex items-center gap-2 bg-white border border-gray-300 text-gray-600 hover:text-indigo-600 hover:border-indigo-400 px-4 py-2 rounded-lg text-sm shadow-sm transition w-full sm:w-auto justify-center">
+            <i class="ri-edit-line"></i> Edit
+        </a>
+
                 <a href="{{ route('tools.index') }}"
            class="flex items-center gap-2 bg-white border border-gray-300 text-gray-600 hover:text-indigo-600 hover:border-indigo-400 px-4 py-2 rounded-lg text-sm shadow-sm transition w-full sm:w-auto justify-center">
             <i class="ri-arrow-left-line"></i> Kembali

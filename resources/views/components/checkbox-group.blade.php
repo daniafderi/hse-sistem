@@ -1,25 +1,52 @@
 @props([
     'name' => 'users',
     'options' => [],
-    'currentUser' => null, // user yang sedang login
+    'currentUser' => null,
+    'selected' => [], // 🔥 TAMBAHKAN INI
     'label' => 'Pilih Kontributor'
 ])
 
 <div 
     x-data="{
-        showModal: false,
-        contributors: [{ id: {{ $currentUser->id }}, name: '{{ $currentUser->name }}', isOwner: true }],
-        users: @js($options),
+    showModal: false,
 
-        toggleUser(user) {
-            if (!this.contributors.find(c => c.id === user.id)) {
-                this.contributors.push({ id: user.id, name: user.name, isOwner: false });
-            }
-        },
-        removeUser(id) {
-            this.contributors = this.contributors.filter(c => c.id !== id || c.isOwner);
+    users: @js($options),
+
+    selectedIds: @js($selected),
+
+    contributors: [],
+
+    init() {
+        // 🔥 mapping selected ID ke object user
+        this.contributors = this.users
+            .filter(user => this.selectedIds.includes(user.id))
+            .map(user => ({
+                id: user.id,
+                name: user.name,
+                isOwner: user.id === {{ $currentUser->id }}
+            }));
+
+        // 🔥 pastikan current user selalu ada
+        if (!this.contributors.find(c => c.id === {{ $currentUser->id }})) {
+            this.contributors.unshift({
+                id: {{ $currentUser->id }},
+                name: '{{ $currentUser->name }}',
+                isOwner: true
+            });
         }
-    }"
+    },
+
+    toggleUser(user) {
+        if (!this.contributors.find(c => c.id === user.id)) {
+            this.contributors.push({ id: user.id, name: user.name, isOwner: false });
+        }
+    },
+
+    removeUser(id) {
+        this.contributors = this.contributors.filter(c => c.id !== id || c.isOwner);
+    }
+}"
+x-init="init()"
     class="space-y-3"
 >
     <label class="block text-sm font-semibold text-gray-700">{{ $label }}</label>

@@ -65,7 +65,7 @@
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
           <div class="mb-6">
             <h3 class="text-2xl font-semibold text-gray-800">Masuk ke akun Anda</h3>
-            <p class="text-sm text-gray-500 mt-1">Belum punya akun? <a href="{{ route('register') }}" class="text-indigo-600 font-medium">Daftar</a></p>
+            <p class="text-sm text-gray-500 mt-1">Belum punya akun? Hubungi Admin untuk membuat akun baru</p>
           </div>
 
           {{-- menampilkan pesan error umum --}}

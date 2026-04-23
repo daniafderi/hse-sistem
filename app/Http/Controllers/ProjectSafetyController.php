@@ -58,7 +58,7 @@ class ProjectSafetyController extends Controller
     public function create()
     {
         if(Gate::allows('tambah-project')) {
-            $statuses = ['Berjalan', 'Selesai', 'Dibatalkan', 'Dihentikan'];
+            $statuses = ['Berjalan', 'Selesai', 'Dihentikan'];
             return view('pages.safety_patrol.create', compact('statuses'));
 
         }

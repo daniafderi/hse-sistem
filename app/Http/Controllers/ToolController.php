@@ -54,7 +54,7 @@ class ToolController extends Controller
      */
     public function edit(Tool $tool)
     {
-        return view('tools.edit', compact('tool'));
+        return view('pages.tool.edit', compact('tool'));
     }
 
     /**

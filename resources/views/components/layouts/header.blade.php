@@ -1,28 +1,136 @@
 <!-- MAIN HEADER -->
- <header class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-6 shadow-sm transition-all duration-300 ease-in-out" :class="openSidebar ? 'ps-[calc((var(--spacing)_*_70)_+_24px)]' : 'ps-unset'"> 
+<header
+    class="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-6 shadow-sm transition-all duration-300 ease-in-out"
+    :class="openSidebar ? 'ps-[calc((var(--spacing)_*_70)_+_24px)]' : 'ps-unset'" x-data="{
+        timeAgo(date) {
+            const now = new Date();
+            const past = new Date(date);
+            const diff = Math.floor((now - past) / 1000);
+    
+            if (diff < 60) return diff + ' detik lalu';
+            if (diff < 3600) return Math.floor(diff / 60) + ' menit lalu';
+            if (diff < 86400) return Math.floor(diff / 3600) + ' jam lalu';
+            if (diff < 2592000) return Math.floor(diff / 86400) + ' hari lalu';
+    
+            return past.toLocaleDateString();
+        }
+    }">
     <div class="flex items-center gap-4">
-      <button @click="openSidebar = !openSidebar" class="text-gray-500 hover:text-indigo-600 transition-all duration-300 ease-in-out" :class="openSidebar ? 'rotate-180' : ''">
-        <i class="ri-menu-unfold-line text-xl"></i>
-      </button>
-      <div class="relative hidden">
-        <input type="text" placeholder="Cari laporan, proyek..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-        <i class="ri-search-line absolute left-3 top-2 text-gray-400"></i>
-      </div>
+        <button @click="openSidebar = !openSidebar"
+            class="text-gray-500 hover:text-indigo-600 transition-all duration-300 ease-in-out"
+            :class="openSidebar ? 'rotate-180' : ''">
+            <i class="ri-menu-unfold-line text-xl"></i>
+        </button>
+        <div class="relative hidden">
+            <input type="text" placeholder="Cari laporan, proyek..."
+                class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+            <i class="ri-search-line absolute left-3 top-2 text-gray-400"></i>
+        </div>
     </div>
 
     <div class="flex items-center gap-4">
-      <button class="relative text-gray-500 hover:text-indigo-600 hidden">
-        <i class="ri-notification-3-line text-xl"></i>
-        <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-      </button>
-      <button class="text-gray-500 hover:text-indigo-600 hidden">
-        <i class="ri-settings-3-line text-xl"></i>
-      </button>
-      <a href="{{route('profile.edit')}}" class="flex items-center gap-2 bg-indigo-50 rounded-full px-3 py-1 hover:bg-indigo-100 cursor-pointer">
-        <img src="https://i.pravatar.cc/40" class="w-8 h-8 rounded-full border border-white" alt="">
-        <span class="font-medium text-sm text-indigo-700">{{ Auth::user()->name }}</span>
-        <i class="ri-arrow-down-s-line text-indigo-500 hidden"></i>
-      </a>
+        <div x-data="{
+            open: false,
+            notifications: @js($globalNotifications)
+        }" class="relative">
+
+            <!-- 🔔 BUTTON -->
+            <button @click="open = !open"
+                class="relative p-2 rounded-full bg-white shadow hover:shadow-md hover:bg-gray-50 transition">
+
+                <i class="ri-notification-3-line text-xl text-gray-700"></i>
+
+                <!-- Badge -->
+                <span x-show="notifications.filter(n => !n.read).length"
+                    class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
+                    x-text="notifications.filter(n => !n.read).length">
+                </span>
+            </button>
+
+            <!-- 🔔 DROPDOWN -->
+            <div x-show="open" @click.outside="open = false" x-transition
+                class="absolute right-0 mt-3 w-96 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 z-50">
+
+                <!-- HEADER -->
+                <div class="flex items-center justify-between px-4 py-3 border-b">
+                    <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+                        <i class="ri-notification-3-fill text-indigo-500"></i>
+                        Notifikasi
+                    </h3>
+                </div>
+
+                <!-- LIST -->
+                <div class="max-h-80 overflow-y-auto divide-y">
+
+                    <template x-for="notif in notifications" :key="notif.id" x-data="{
+                        reportUrl: '{{ route('daily-report.show', ':id') }}',
+                        apdUrl: '{{ route('tools.show', ':id') }}',
+                    
+                        getUrl(notif) {
+                            if (notif.type === 'report_created' || notif.type === 'report_validate') {
+                                return this.reportUrl.replace(':id', notif.notifiable_id);
+                            }
+                    
+                            if (notif.type === 'apd') {
+                                return this.apdUrl.replace(':id', notif.notifiable_id);
+                            }
+                    
+                            return '#';
+                        }
+                    }">
+                        <a :href="getUrl(notif)"
+                            class="flex items-start gap-3 p-4 hover:bg-gray-50 transition cursor-pointer">
+
+                            <!-- ICON -->
+                            <div>
+                                <template x-if="notif.type === 'report_created'">
+                                    <div class="bg-blue-100 text-blue-600 p-2 rounded-full">
+                                        <i class="ri-file-list-3-line"></i>
+                                    </div>
+                                </template>
+
+                                <template x-if="notif.type === 'report_validate'">
+                                    <div class="bg-yellow-100 text-yellow-600 p-2 rounded-full">
+                                        <i class="ri-refresh-line"></i>
+                                    </div>
+                                </template>
+
+                                <template x-if="notif.type === 'success'">
+                                    <div class="bg-green-100 text-green-600 p-2 rounded-full">
+                                        <i class="ri-checkbox-circle-line"></i>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- CONTENT -->
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-800" x-text="notif.title"></p>
+
+                                <span class="text-xs text-gray-400" x-text="timeAgo(notif.created_at)"></span>
+                            </div>
+
+                            <!-- UNREAD DOT -->
+                            <div x-show="!notif.is_read" class="w-2 h-2 bg-indigo-500 rounded-full mt-2"></div>
+                        </a>
+                    </template>
+
+                </div>
+
+                <!-- FOOTER -->
+                <div class="p-3 text-center border-t">
+                    <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+                        Lihat Semua Notifikasi →
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        <a href="{{ route('profile.edit') }}"
+            class="flex items-center gap-2 bg-indigo-50 rounded-full px-3 py-1 hover:bg-indigo-100 cursor-pointer">
+            <img src="https://i.pravatar.cc/40" class="w-8 h-8 rounded-full border border-white" alt="">
+            <span class="font-medium text-sm text-indigo-700">{{ Auth::user()->name }}</span>
+            <i class="ri-arrow-down-s-line text-indigo-500 hidden"></i>
+        </a>
     </div>
-  </header>
+</header>
 <!-- END HEADER -->

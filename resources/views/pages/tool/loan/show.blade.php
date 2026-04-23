@@ -15,6 +15,7 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-2">
+                @can('isHseKantor')
                 <button @click="openReturnModal = true"
                     class="inline-flex items-center justify-center gap-2 px-4 py-2
                            text-white bg-indigo-600 rounded-lg shadow
@@ -22,6 +23,8 @@
                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                     Proses Pengembalian
                 </button>
+                    
+                @endcan
 
                 <a href="{{ route('loans.index') }}"
                     class="inline-flex items-center justify-center gap-2 px-4 py-2
@@ -96,10 +99,10 @@
                 <table class="min-w-full text-sm text-gray-600">
                     <thead class="bg-gray-50 border-b text-gray-700">
                         <tr>
-                            <th class="px-4 py-3 font-medium">Tanggal</th>
-                            <th class="px-4 py-3 font-medium">Alat</th>
+                            <th class="px-4 py-3 font-medium text-left">Tanggal</th>
+                            <th class="px-4 py-3 font-medium text-left">Alat</th>
                             <th class="px-4 py-3 font-medium text-center">Jumlah</th>
-                            <th class="px-4 py-3 font-medium hidden sm:table-cell">Kondisi</th>
+                            <th class="px-4 py-3 font-medium hidden sm:table-cell text-left">Kondisi</th>
                         </tr>
                     </thead>
                     <tbody>

@@ -12,6 +12,7 @@
                         Manajemen data alat kerja dan perlengkapan keselamatan
                     </p>
                 </div>
+                @can('isHseKantor')
                 <div class="inline-flex gap-4">
                     <button @click="open = true"
                         class="px-4 text-sm font-medium py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
@@ -22,6 +23,8 @@
                         <i class="ri-add-line"></i> Tambah Alat / APD
                     </a>
                 </div>
+                    
+                @endcan
             </div>
 
             <!-- Search & Filter -->

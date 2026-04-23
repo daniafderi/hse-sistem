@@ -113,7 +113,7 @@
                                         @php
                                             $badgeClass = match ($laporan->status_validasi) {
                                                 'menunggu validasi' => 'bg-blue-50 text-blue-700',
-                                                'divalidasi' => 'bg-green-50 text-green-700',
+                                                'valid' => 'bg-green-50 text-green-700',
                                                 'revisi' => 'bg-orange-50 text-orange-700',
                                                 default => 'bg-red-50 text-red-700',
                                             };

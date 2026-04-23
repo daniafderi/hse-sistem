@@ -135,7 +135,7 @@
                                         bg-green-600
                                     @else
                                         bg-red-600
-                                    @endif h-2 rounded-full" style="width: {{ ($tool->stock / $tool->stock_minimum) * 100 }}%"></div>
+                                    @endif h-2 rounded-full max-w-full" style="width: {{ ($tool->stock / $tool->stock_minimum) * 100 }}%"></div>
                                 </div>
                                 <p class="text-xs text-gray-500 mt-1">{{ $tool->stock }}/{{ $tool->stock_minimum }} stock tersisa</p>
                             </div>
@@ -153,12 +153,6 @@
                             Kirim Pengingat
                         </button>
                     </div>
-
-                    @foreach($notifs as $notif)
-<div class="alert alert-danger">
-    {{ $notif->message }}
-</div>
-@endforeach
                 </div>
             </div>
         </div>

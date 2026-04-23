@@ -12,7 +12,7 @@
                         Monitoring peminjaman dan pengembalian alat kerja
                     </p>
                 </div>
-
+                @can('isHseKantor')
                 <a href="{{ route('loans.create') }}"
                    class="inline-flex items-center justify-center gap-2 px-4 py-2
                           bg-indigo-600 hover:bg-indigo-700 text-white text-sm
@@ -20,6 +20,8 @@
                     <i class="ri-add-line"></i>
                     Tambah Peminjaman
                 </a>
+                    
+                @endcan
             </div>
 
             <!-- Search -->
@@ -67,8 +69,8 @@
                                 </td>
 
                                 <td class="px-4 sm:px-6 py-4 hidden lg:table-cell">
-                                    @if ($loan->return_date)
-                                        {{ \Carbon\Carbon::parse($loan->return_date)->format('d M Y') }}
+                                    @if ($loan->returned_at)
+                                        {{ \Carbon\Carbon::parse($loan->returned_at)->format('d M Y') }}
                                     @else
                                         <span class="text-gray-400 italic">Belum ditentukan</span>
                                     @endif

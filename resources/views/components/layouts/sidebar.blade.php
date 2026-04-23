@@ -33,6 +33,7 @@
                 <div class="border-t border-gray-100 my-2"></div>
 
                 <!-- 🔽 DROPDOWN: Safety Works -->
+                @if (auth()->user()->can('isSupervisor') || auth()->user()->can('isHseLapangan'))
                 <div x-data="{
                     open: @json(Request::routeIs('daily-report.*') ? true : (Request::routeIs('project.*') ? true : false))
                 }">
@@ -51,23 +52,30 @@
                             class="block text-sm hover:text-indigo-600 {{ Request::routeIs('project.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             Project Patrol
                         </a>
+                        @can('isHseLapangan')
                         <a href="{{ route('daily-report.index') }}"
                             class="block text-sm hover:text-indigo-600 {{ Request::routeIs('daily-report.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             Daily Report
                         </a>
+                        @endcan
                     </div>
                 </div>
 
+                @endif
+
                 <!-- Briefing -->
+                @can('isHseLapangan')
                 <a href="{{ route('safety-briefing.index') }}"
                     class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium 
                      hover:bg-indigo-50 hover:text-indigo-600 transition {{ Request::routeIs('safety-briefing.*') ? 'text-white bg-blue-600 ' : 'text-gray-700' }}">
                     <i class="ri-user-voice-line text-lg"></i> Safety Briefing
                 </a>
+                @endcan
 
                 <div class="border-t border-gray-100 my-2"></div>
 
                 <!-- 🔽 DROPDOWN: Equipment -->
+                @if (auth()->user()->can('isHseKantor') || auth()->user()->can('isSupervisor'))
                 <div x-data="{ open: @json(Request::routeIs('tools.*') ? true : (Request::routeIs('loans.*') ? true : false)) }" class="mt-2">
                     <button @click="open = !open"
                         class="flex items-center justify-between w-full px-3 py-2 text-sm font-medium 
@@ -88,6 +96,8 @@
                         </a>
                     </div>
                 </div>
+                    
+                @endif
 
                 <!-- Briefing -->
                 @can('isHseAdmin')
