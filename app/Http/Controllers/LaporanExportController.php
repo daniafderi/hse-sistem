@@ -20,7 +20,7 @@ class LaporanExportController extends Controller
 
     public function export(Request $request)
     {
-        $templatePath = storage_path('app/templates/weekly-report.xlsx');
+        $templatePath = storage_path('app/public/templates/weekly-report.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
         $sheetUac = $spreadsheet->getSheetByName("2. Laporan UAC");

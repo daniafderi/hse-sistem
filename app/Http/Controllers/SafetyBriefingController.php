@@ -176,7 +176,7 @@ class SafetyBriefingController extends Controller
 
     public function download($file)
     {
-        $path = storage_path('app/templates/' . $file);
+        $path = storage_path('app/public/templates/' . $file);
 
         if (!file_exists($path)) {
             abort(404);

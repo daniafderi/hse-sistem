@@ -10,10 +10,32 @@ class ToolController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tools = Tool::orderBy('name')->paginate(12);
-        return view('pages.tool.index', compact('tools'));
+        $query = Tool::query();
+
+        // ============================
+        // 2. Pencarian
+        // ============================
+        if ($request->search) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // ============================
+        // 3. Sorting (Urutkan)
+        // terbaru = desc, terlama = asc
+        // ============================
+        if ($request->sort === 'aman') {
+            $query->whereRaw('stock > stock_minimum * 0.1');
+        } else if ($request->sort === 'menipis'){
+            $query->whereRaw('stock <= stock_minimum * 0.1'); // default terbaru
+        }
+
+        $tools = $query->paginate(10)->withQueryString();
+
+        $datas = Tool::all();
+
+        return view('pages.tool.index', compact('tools', 'datas'));
     }
 
     /**

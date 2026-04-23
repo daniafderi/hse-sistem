@@ -29,18 +29,18 @@
 
             <!-- Search & Filter -->
             <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div class="relative w-full md:max-w-md">
+                <form action="{{ route('tools.index') }}" method="get" class="relative w-full md:max-w-md">
                     <i class="ri-search-line absolute left-3 top-2.5 text-gray-400"></i>
-                    <input type="text" placeholder="Cari alat atau APD..."
+                    <input name="search" value="{{ request()->search }}" type="text" placeholder="Cari alat atau APD..."
                         class="pl-10 w-full border border-gray-200 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
+                </form>
 
                 <div class="flex flex-col sm:flex-row gap-2">
-                    <select
+                    <select onchange="location.href=this.value"
                         class="border border-gray-200 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2">
                         <option>Semua Status</option>
-                        <option>Aman</option>
-                        <option>Menipis</option>
+                        <option value="{{ request()->fullUrlWithQuery(['sort' => 'aman']) }}" @if(request()->sort == 'aman') selected @endif>Aman</option>
+                        <option value="{{ request()->fullUrlWithQuery(['sort' => 'menipis']) }}" @if(request()->sort == 'menipis') selected @endif>Menipis</option>
                     </select>
                 </div>
             </div>
@@ -142,7 +142,7 @@
                             Pilih APD
                         </label>
                         <select name="tool_id" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
-                            @foreach ($tools as $tool)
+                            @foreach ($datas as $tool)
                                 <option value="{{ $tool->id }}">{{ $tool->name }}</option>
                             @endforeach
                         </select>

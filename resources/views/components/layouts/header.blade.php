@@ -49,7 +49,7 @@
 
             <!-- 🔔 DROPDOWN -->
             <div x-show="open" @click.outside="open = false" x-transition
-                class="absolute right-0 mt-3 w-96 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 z-50">
+                class="absolute right-0 mt-3 w-96 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 z-[99]">
 
                 <!-- HEADER -->
                 <div class="flex items-center justify-between px-4 py-3 border-b">
