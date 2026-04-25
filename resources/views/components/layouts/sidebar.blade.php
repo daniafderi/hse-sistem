@@ -52,12 +52,10 @@
                             class="block text-sm hover:text-indigo-600 {{ Request::routeIs('project.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             Project Patrol
                         </a>
-                        @can('isHseLapangan')
                         <a href="{{ route('daily-report.index') }}"
                             class="block text-sm hover:text-indigo-600 {{ Request::routeIs('daily-report.*') ? 'text-blue-600' : 'text-gray-600' }}">
                             Daily Report
                         </a>
-                        @endcan
                     </div>
                 </div>
 

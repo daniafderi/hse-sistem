@@ -66,7 +66,7 @@ class ToolController extends Controller
             'stock' => 'required|integer|min:0',
             'stock_minimum' => 'required|integer|min:0'
         ]);
-        Tool::create($request->only(['name', 'stock', 'stock_minimum']) + [
+        $tool = Tool::create($request->only(['name', 'stock', 'stock_minimum']) + [
         'validation' => 'menunggu'
     ]);
 
@@ -74,7 +74,7 @@ class ToolController extends Controller
             'type' => 'apd_validate',
             'title' => 'APD Baru ditambahkan',
             'message' => 'APD baru telah ditambahkan ke sistem',
-            'notifiable_id' => $data->id,
+            'notifiable_id' => $tool->id,
             'notifiable_type' => Tool::class,
             'created_by' => auth()->id()
         ]);
