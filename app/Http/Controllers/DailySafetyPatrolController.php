@@ -161,7 +161,7 @@ class DailySafetyPatrolController extends Controller
     'created_by' => auth()->id()
 ]);
 
-$users = User::whereIn('role', ['hselapangan', 'supervisor'])->pluck('id');
+$users = User::whereIn('role', ['HSE Lapangan', 'Supervisor'])->pluck('id');
 
 // kirim ke user tertentu
 $notif->users()->attach($users);

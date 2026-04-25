@@ -27,7 +27,7 @@ class LoanController extends Controller
      */
     public function create()
     {
-        $tools = Tool::where('stock', '>', 0)->orderBy('name')->get();
+        $tools = Tool::where('stock', '>', 0)->where('validation', 'valid')->orderBy('name')->get();
         return view('pages.tool.loan.create', compact('tools'));
     }
 

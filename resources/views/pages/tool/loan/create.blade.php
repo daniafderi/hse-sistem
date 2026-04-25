@@ -16,7 +16,7 @@
             </div>
 
             <!-- Daftar Item -->
-            <div x-data="loanForm()" class="space-y-3">
+            <div x-data="loanForm(); @js($tools)" class="space-y-3">
                 <template x-for="(item, idx) in items" :key="idx">
                     <div
                         class="grid grid-cols-12 gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm relative">
@@ -49,8 +49,8 @@
                 </template>
 
                 <!-- Tombol Tambah Item -->
-                <button type="button" @click="add()"
-                    class="px-4 py-2 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded-lg font-medium transition">
+                <button type="button" @click="add()" :disabled="items.length = tools.length"
+                    class="px-4 py-2 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded-lg font-medium transition disabled:bg-gray-300 disabled:cursor-not-allowed"">
                     + Tambah Item
                 </button>
 

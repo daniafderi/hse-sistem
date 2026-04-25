@@ -55,6 +55,10 @@
                             <th class="px-4 sm:px-6 py-3 text-center hidden md:table-cell">
                                 Status
                             </th>
+                            @if(auth()->user()->can('isSupervisor') || auth()->user()->can('isHseKantor'))
+                            <th class="px-4 sm:px-6 py-3 text-center">Validasi</th>
+                                
+                            @endif
                             <th class="px-4 sm:px-6 py-3 text-center hidden lg:table-cell">
                                 Terakhir Diperbarui
                             </th>
@@ -90,6 +94,12 @@
                                         <span class="px-2 py-1 rounded-full badge bg-rose-100 text-rose-700">Hampir Habis</span>
                                     @endif
                                 </td>
+                                @if (auth()->user()->can('isSupervisor') || auth()->user()->can('isHseKantor'))
+                                <td class="px-4 sm:px-6 py-4 text-center text-gray-500">
+                                    {{ $tool['validation'] }}
+                                </td>
+                                    
+                                @endif
 
                                 <td class="px-4 sm:px-6 py-4 text-center text-gray-500 hidden lg:table-cell">
                                     {{ $tool['updated_at'] }}

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('stock')->default(0);
             $table->integer('stock_minimum')->default(0);
             $table->string('satuan')->default('pcs')->nullable();
+            $table->string('validation')->default('menunggu')->nullable();
             $table->timestamps();
         });
     }

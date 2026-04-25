@@ -15,22 +15,22 @@
                         <i class="ri-user-add-line"></i> Tambah User
                     </a>
 
-                    <div class="relative w-full sm:w-64">
-                        <input type="text" placeholder="Cari user..." x-model="search"
+                    <form action="{{ route('user.index') }}" method="get" class="relative w-full sm:w-64">
+                        <input name="search" value="{{ request()->search }}" type="text" placeholder="Cari user..." x-model="search"
                             class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-violet-200 focus:border-violet-400 text-sm">
                         <i class="ri-search-line absolute left-3 top-2.5 text-gray-400"></i>
-                    </div>
+                    </form>
                 </div>
             </div>
 
             <!-- Sort -->
             <div class="flex justify-end mb-4">
-                <select x-model="sort"
+                <select onchange="location.href=this.value"
                     class="w-full sm:w-auto px-4 py-2 rounded-xl border border-gray-300 text-gray-600 text-sm focus:border-violet-300">
-                    <option value="latest">Urutkan: Terbaru</option>
-                    <option value="oldest">Terlama</option>
-                    <option value="name_asc">Nama A-Z</option>
-                    <option value="name_desc">Nama Z-A</option>
+                    <option value="{{ request()->fullUrlWithQuery(['sort' => 'terbaru']) }}" @if(request()->sort == 'terbaru') selected @endif>Terbaru</option>
+                    <option value="{{ request()->fullUrlWithQuery(['sort' => 'terlama']) }}" @if(request()->sort == 'terlama') selected @endif>Terlama</option>
+                    <option value="{{ request()->fullUrlWithQuery(['sort' => 'name_asc']) }}" @if(request()->sort == 'name_asc') selected @endif>Nama A-Z</option>
+                    <option value="{{ request()->fullUrlWithQuery(['sort' => 'name_desc']) }}" @if(request()->sort == 'name_desc') selected @endif>Nama Z-A</option>
                 </select>
             </div>
 

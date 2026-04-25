@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     ->name('stock-transactions.store');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('/user', UserController::class)->middleware('can:isHseAdmin');
+    Route::post('/user/{user}/reset-password', [UserController::class, 'resetPassword'])->name('user.resetPassword')->middleware('can:isHseAdmin');
     Route::prefix('/safety-patrol')->group(function () {
         Route::resource('/project', ProjectSafetyController::class);
         Route::get('/project/{id}/export', [ProjectSafetyController::class, 'exportCsv'])->name('project.export.single');
@@ -46,6 +47,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('loans', LoanController::class)->except(['edit', 'update', 'destroy']);
         // route untuk proses pengembalian (POST)
         Route::post('loans/{loan}/return', [LoanController::class, 'return'])->name('loans.return');
+        Route::post(
+            '/tools/{tool}/validate',
+            [ToolController::class, 'validation']
+        )->name('tools.validate')->middleware('can:isSupervisor');
     });
     Route::get('/my-activity', [ActivityController::class, 'index'])->name('activity.index');
     Route::resource('/safety-briefing', SafetyBriefingController::class);

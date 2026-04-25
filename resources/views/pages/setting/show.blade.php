@@ -5,6 +5,10 @@
                 <h1 class="text-2xl font-semibold text-gray-800">Profile Saya</h1>
                 <p class="text-sm text-gray-500">Kelola informasi akun dan keamanan</p>
             </div>
+            <a href="{{ url()->previous() }}"
+                    class="flex items-center gap-2 bg-white border border-gray-300 text-gray-600 hover:text-indigo-600 hover:border-indigo-400 px-4 py-2 rounded-lg text-sm shadow-sm transition">
+                    Kembali
+                </a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Informasi User -->
