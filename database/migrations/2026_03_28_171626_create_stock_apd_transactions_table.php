@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('tool_id')->constrained()->cascadeOnDelete();
             $table->enum('type', ['in', 'out']);
             $table->integer('quantity');
+            $table->integer('stock_before');
             $table->text('note')->nullable();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();

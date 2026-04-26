@@ -117,7 +117,14 @@ berhasil dicatat.');
      */
     public function destroy(Loan $loan)
     {
-        //
+        //dd($loan->items()->first()->quantity - $loan->items()->first()->returned_quantity);
+        $tool = Tool::findOrFail($loan->items()->latest()->first()->tool_id);
+
+        $tool->increment('stock', $loan->items()->first()->quantity - $loan->items()->first()->returned_quantity);
+
+        $loan->delete();
+
+        return redirect()->route('loans.index')->with('success', 'Berhasil menghapus data peminjaman');
     }
 
     public function return(Loan $loan, Request $request)

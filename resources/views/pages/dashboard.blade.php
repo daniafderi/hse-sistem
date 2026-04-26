@@ -144,7 +144,7 @@
                     </div>
     
                     <!-- Reminder Section -->
-                    <div class="bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-xl p-5 shadow-md">
+                    <div class="hidden bg-gradient-to-r from-blue-600 to-blue-400 text-white rounded-xl p-5 shadow-md">
                         <h3 class="text-lg font-semibold mb-2">Ingatkan Tim!</h3>
                         <p class="text-sm opacity-90 mb-4">
                             Beberapa tim belum mengisi laporan briefing harian. Kirimkan pengingat sekarang.

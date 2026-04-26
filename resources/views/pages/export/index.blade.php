@@ -1,8 +1,9 @@
 <x-layouts.app title="Export Laporan">
-    <div 
-    x-data="{ tab: 'weekly' }"
+<div 
+    x-data="{ tab: 'weekly', mode: 'month' }"
     class="bg-white w-full rounded-lg shadow-lg p-8"
 >
+
     <!-- HEADER -->
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-slate-800">Export Laporan Safety Patrol</h1>
@@ -29,7 +30,7 @@
         </button>
     </div>
 
-    <!-- ================= WEEKLY EXPORT ================= -->
+    <!-- ================= WEEKLY ================= -->
     <form 
         x-show="tab === 'weekly'" 
         x-transition
@@ -37,6 +38,8 @@
         action="{{ route('laporan.export') }}"
         class="space-y-6"
     >
+        <input type="hidden" name="type" value="weekly">
+
         <div>
             <label class="block text-sm font-medium text-slate-700 mb-1">
                 Tanggal Mulai Mingguan
@@ -47,20 +50,14 @@
                 required
                 class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500"
             >
-            <p class="text-xs text-slate-500 mt-1">
-                Laporan akan diambil selama 7 hari dari tanggal ini
-            </p>
         </div>
 
-        <button
-            type="submit"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
-        >
+        <button class="w-full bg-blue-600 text-white py-3 rounded-lg">
             Export Laporan Mingguan
         </button>
     </form>
 
-    <!-- ================= MONTHLY EXPORT ================= -->
+    <!-- ================= MONTHLY ================= -->
     <form 
         x-show="tab === 'monthly'" 
         x-transition
@@ -68,41 +65,82 @@
         action="{{ route('laporan.export') }}"
         class="space-y-6"
     >
+        <input type="hidden" name="type" value="monthly">
+
+        <!-- MODE PILIHAN -->
         <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">
-                Tanggal Mulai
+            <label class="block text-sm font-medium text-slate-700 mb-2">
+                Pilih Metode
             </label>
-            <input 
-                type="date" 
-                name="start_date"
-                required
-                class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-            >
+
+            <div class="flex gap-4">
+                <label class="flex items-center gap-2">
+                    <input type="radio" value="month" name="mode" x-model="mode">
+                    <span>Pilih Bulan</span>
+                </label>
+
+                <label class="flex items-center gap-2">
+                    <input type="radio" value="custom" name="mode" x-model="mode">
+                    <span>Custom Tanggal</span>
+                </label>
+            </div>
         </div>
 
-        <div>
+        <!-- MODE: BULAN -->
+        <div x-show="mode === 'month'" x-transition>
             <label class="block text-sm font-medium text-slate-700 mb-1">
                 Pilih Bulan
             </label>
-            <select 
-                name="month"
-                required
-                class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-            >
-                <option value="">-- Pilih Bulan --</option>
-                <option value="1">Januari</option>
-                <option value="2">Februari</option>
-                <option value="3">Maret</option>
-                <option value="4">April</option>
-                <option value="5">Mei</option>
-                <option value="6">Juni</option>
-                <option value="7">Juli</option>
-                <option value="8">Agustus</option>
-                <option value="9">September</option>
-                <option value="10">Oktober</option>
-                <option value="11">November</option>
-                <option value="12">Desember</option>
-            </select>
+
+            <div class="grid grid-cols-2 gap-4">
+                <select name="month"
+                    class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">-- Bulan --</option>
+                    <option value="1">Januari</option>
+                    <option value="2">Februari</option>
+                    <option value="3">Maret</option>
+                    <option value="4">April</option>
+                    <option value="5">Mei</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli</option>
+                    <option value="8">Agustus</option>
+                    <option value="9">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+
+                <!-- optional: pilih tahun -->
+                <select name="year"
+                    class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+                    @for ($y = now()->year; $y >= 2020; $y--)
+                        <option value="{{ $y }}">{{ $y }}</option>
+                    @endfor
+                </select>
+            </div>
+
+            <p class="text-xs text-slate-500 mt-1">
+                Data akan diambil dari tanggal 1 sampai akhir bulan
+            </p>
+        </div>
+
+        <!-- MODE: CUSTOM -->
+        <div x-show="mode === 'custom'" x-transition class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Tanggal Mulai
+                </label>
+                <input type="date" name="start_date"
+                    class="w-full rounded-lg border-slate-300">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Tanggal Akhir
+                </label>
+                <input type="date" name="end_date"
+                    class="w-full rounded-lg border-slate-300">
+            </div>
         </div>
 
         <button
@@ -112,5 +150,6 @@
             Export Laporan Bulanan
         </button>
     </form>
+
 </div>
 </x-layouts.app>

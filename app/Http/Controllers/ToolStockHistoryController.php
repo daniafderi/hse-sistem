@@ -6,6 +6,9 @@ use App\Models\StockApdTransaction;
 use App\Models\Tool;
 use App\Models\ToolStockHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Notification;
+use App\Models\User;
 
 class ToolStockHistoryController extends Controller
 {
@@ -30,7 +33,9 @@ class ToolStockHistoryController extends Controller
             'tool_id' => $apd->id,
             'type' => $request->type,
             'quantity' => $request->quantity,
-            'note' => $request->note
+            'note' => $request->note,
+            'user_id' => auth()->id(),
+            'stock_before' => $apd->stock
         ]);
 
         // 🔄 UPDATE STOK
@@ -38,6 +43,22 @@ class ToolStockHistoryController extends Controller
             $apd->increment('stock', $request->quantity);
         } else {
             $apd->decrement('stock', $request->quantity);
+        }
+
+        if ($apd->stock < ($apd->stock_minimum * 0.10)) {
+            $notif = Notification::create([
+                'type' => 'report_created',
+                'title' => 'Stock APD Menipis',
+                'message' => 'Stock APD ' . $apd->name . ' dibawah kebutuhan pertahun',
+                'notifiable_id' => $apd->id,
+                'notifiable_type' => Tool::class,
+                'created_by' => auth()->id()
+            ]);
+
+            $users = User::whereIn('role', ['HSE Kantor', 'Supervisor'])->pluck('id');
+
+            // kirim ke user tertentu
+            $notif->users()->attach($users);
         }
 
         return back()->with('success', 'Transaksi berhasil!');

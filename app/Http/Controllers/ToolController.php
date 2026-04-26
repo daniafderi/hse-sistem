@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LoanItem;
 use App\Models\Tool;
 use Illuminate\Http\Request;
 use App\Models\Notification;
+use App\Models\StockApdTransaction;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Carbon\Carbon;
 
 class ToolController extends Controller
 {
@@ -38,7 +44,6 @@ class ToolController extends Controller
             $tools = $query->paginate(10)->withQueryString();
         } else {
             $tools = $query->where('validation', 'valid')->paginate(10)->withQueryString();
-
         }
 
         $datas = $query->get();
@@ -67,10 +72,10 @@ class ToolController extends Controller
             'stock_minimum' => 'required|integer|min:0'
         ]);
         $tool = Tool::create($request->only(['name', 'stock', 'stock_minimum']) + [
-        'validation' => 'menunggu'
-    ]);
+            'validation' => 'menunggu'
+        ]);
 
-    $notif = Notification::create([
+        $notif = Notification::create([
             'type' => 'apd_validate',
             'title' => 'APD Baru ditambahkan',
             'message' => 'APD baru telah ditambahkan ke sistem',
@@ -125,7 +130,11 @@ class ToolController extends Controller
      */
     public function destroy(Tool $tool)
     {
-        //
+        $tool->delete();
+
+        LoanItem::where('tool_id', $tool->id)->delete();
+
+        return redirect()->route('tools.index')->with('success', 'Berhasil menghapus APD');
     }
 
     public function validation(Request $request, Tool $tool)
@@ -157,5 +166,89 @@ class ToolController extends Controller
         $notif->users()->attach($users);
 
         return back()->with('toast_success', 'Validasi berhasil disimpan.');
+    }
+
+    public function export()
+    {
+        return view('pages.tool.export');
+    }
+
+    public function download(Request $request)
+    {
+        $templatePath = storage_path('app/public/templates/apd.xlsx');
+        $spreadsheet = IOFactory::load($templatePath);
+        $sheet = $spreadsheet->getActiveSheet();
+        $tanggalMulai = Carbon::parse($request->tanggal_mulai);
+        $tanggalAkhir = $tanggalMulai->copy()->addDays(5);
+
+        $rowExcel = 9;
+
+        $data = Tool::with(['stockTransaction' => function ($query) use ($tanggalMulai, $tanggalAkhir) {
+            $query->whereBetween('created_at', [
+                $tanggalMulai->toDateString(),
+                $tanggalAkhir->toDateString()
+            ]);
+        }])->get();
+
+        //dd($data);
+
+        $startColumnIndex = 5; // D
+
+        foreach ($data as $index => $tool) {
+
+            // 1️⃣ Tulis nama APD
+            $sheet->setCellValue('A' . $rowExcel, $index + 1);
+            $sheet->setCellValue('B' . $rowExcel, $tool->name);
+            $sheet->setCellValue('D' . $rowExcel, $tool->stockTransaction->first()?->stock_before ?? 0);
+            $sheet->setCellValue('Q' . $rowExcel, $tool->stock);
+
+            // 2️⃣ Init data harian
+            $days = [];
+
+            for ($day = 1; $day <= 6; $day++) {
+                $days[$day] = [
+                    'masuk' => 0,
+                    'keluar' => 0,
+                ];
+            }
+
+            // 3️⃣ Isi dari transaksi
+            foreach ($tool->stockTransaction as $trx) {
+
+                $day = $tanggalMulai
+    ->diffInDays(Carbon::parse($trx->created_at), false) + 1;
+
+                if ($day >= 1 && $day <= 6) {
+
+                    if ($trx->type === 'in') {
+                        $days[$day]['masuk'] += $trx->quantity;
+                    } else {
+                        $days[$day]['keluar'] += $trx->quantity;
+                    }
+                }
+            }
+
+            // 4️⃣ Masukkan ke Excel (Masuk & Keluar)
+            foreach ($days as $day => $val) {
+
+                $baseCol = $startColumnIndex + (($day - 1) * 2);
+
+                $masukCol  = Coordinate::stringFromColumnIndex($baseCol);
+                $keluarCol = Coordinate::stringFromColumnIndex($baseCol + 1);
+
+                $sheet->setCellValue($masukCol . $rowExcel, $val['masuk']);
+                $sheet->setCellValue($keluarCol . $rowExcel, $val['keluar']);
+            }
+
+            $rowExcel++;
+        }
+
+        return new StreamedResponse(function () use ($spreadsheet) {
+            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save('php://output');
+        }, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment;filename="apd-report-' . now()->format('d M Y') . '.xlsx"',
+        ]);
     }
 }

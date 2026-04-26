@@ -14,6 +14,6 @@ class ImageSafetyPatrol extends Model
     public $timestamps = true;
 
     public function safetyPatrol() {
-        return $this->belongsTo(DailySafetyPatrol::class, 'safety_patrol_id');
+        return $this->belongsTo(DailySafetyPatrol::class, 'daily_safety_patrol_id');
     }
 }

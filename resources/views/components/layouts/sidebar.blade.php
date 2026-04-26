@@ -109,10 +109,39 @@
 
                 <!-- Reports -->
                 <a href="{{ route('export.index') }}"
-                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium 
+                    class="hidden items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium 
                     {{ Request::routeIs('export.*') ? 'text-white bg-blue-600 ' : 'text-gray-700' }} hover:bg-indigo-50 hover:text-indigo-600 transition">
                     <i class="ri-bar-chart-line text-lg"></i> Reports
                 </a>
+
+                <!-- 🔽 DROPDOWN: Safety Works -->
+                @if (auth()->user()->can('isSupervisor') || auth()->user()->can('isHseKantor'))
+                <div x-data="{
+                    open: @json(Request::routeIs('export.*') ? true : (Request::routeIs('project.*') ? true : false))
+                }">
+                    <button @click="open = !open"
+                        class="flex items-center justify-between w-full px-3 py-2 text-sm font-medium 
+                        text-gray-700 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition">
+                        <span class="flex items-center gap-3">
+                            <i class="ri-bar-chart-line text-lg"></i> Report
+                        </span>
+                        <i class="ri-arrow-down-s-line transition-transform duration-300"
+                            :class="open ? 'rotate-180' : ''"></i>
+                    </button>
+
+                    <div x-show="open" x-collapse class="pl-10 mt-2 space-y-2">
+                        <a href="{{ route('export.index') }}"
+                            class="block text-sm hover:text-indigo-600 {{ Request::routeIs('export.*') ? 'text-blue-600' : 'text-gray-600' }}">
+                            Safety Patrol Report
+                        </a>
+                        <a href="{{ route('tool.laporan') }}"
+                            class="block text-sm hover:text-indigo-600 {{ Request::routeIs('tool.laporan') ? 'text-blue-600' : 'text-gray-600' }}">
+                            APD Report
+                        </a>
+                    </div>
+                </div>
+
+                @endif
 
             </nav>
         </div>
