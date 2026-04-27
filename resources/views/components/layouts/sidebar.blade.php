@@ -115,7 +115,7 @@
                 </a>
 
                 <!-- 🔽 DROPDOWN: Safety Works -->
-                @if (auth()->user()->can('isSupervisor') || auth()->user()->can('isHseKantor'))
+                @if (auth()->user()->can('isSupervisor') || auth()->user()->can('isHseAdmin'))
                 <div x-data="{
                     open: @json(Request::routeIs('export.*') ? true : (Request::routeIs('project.*') ? true : false))
                 }">

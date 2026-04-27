@@ -197,11 +197,11 @@ class LaporanExportController extends Controller
                 $tanggalAkhir->toDateString()
             ])->get();
 
-        //dd($unsafeAction->count());
+        //dd($safetyBriefing->count());
 
         $sheet->setCellValue('E20', "=MAX(E38:E53)");
         $sheet->setCellValue('E21', "=SUM(E55:E70)");
-        $sheet->setCellValue('E21', collect($safetyBriefing)->sum());
+        $sheet->setCellValue('E21', $safetyBriefing->count());
         $sheet->setCellValue('E23', "=SUM(E89:E104)");
         $sheet->setCellValue('E24', "=SUM(E106:E121)");
         $sheet->setCellValue('E25', $unsafeAction->count());
@@ -424,7 +424,7 @@ class LaporanExportController extends Controller
         $sheetSummary->setCellValue('E20', collect($data)->sum(function ($item) {
             return $item->jumlah_pekerja * $item->jam_kerja;
         }));
-        $sheetSummary->setCellValue('E21', collect($safetyBriefing)->sum());
+        $sheetSummary->setCellValue('E21', $safetyBriefing->count());
         $sheetSummary->setCellValue('E22', collect($data)->sum(function ($item) {
             return !empty($item->nearmiss) ? 1 : 0;
         }));
