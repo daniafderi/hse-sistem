@@ -13,17 +13,16 @@
                     </p>
                 </div>
                 @can('isHseKantor')
-                <div class="inline-flex gap-4">
-                    <button @click="open = true"
-                        class="px-4 text-sm font-medium py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
-                        + Transaksi Stok
-                    </button>
-                    <a href="{{ route('tools.create') }}"
-                        class="inline-flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition">
-                        <i class="ri-add-line"></i> Tambah Alat / APD
-                    </a>
-                </div>
-                    
+                    <div class="inline-flex gap-4">
+                        <button @click="open = true"
+                            class="px-4 text-sm font-medium py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
+                            + Transaksi Stok
+                        </button>
+                        <a href="{{ route('tools.create') }}"
+                            class="inline-flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition">
+                            <i class="ri-add-line"></i> Tambah Alat / APD
+                        </a>
+                    </div>
                 @endcan
             </div>
 
@@ -31,7 +30,8 @@
             <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <form action="{{ route('tools.index') }}" method="get" class="relative w-full md:max-w-md">
                     <i class="ri-search-line absolute left-3 top-2.5 text-gray-400"></i>
-                    <input name="search" value="{{ request()->search }}" type="text" placeholder="Cari alat atau APD..."
+                    <input name="search" value="{{ request()->search }}" type="text"
+                        placeholder="Cari alat atau APD..."
                         class="pl-10 w-full border border-gray-200 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500">
                 </form>
 
@@ -39,8 +39,10 @@
                     <select onchange="location.href=this.value"
                         class="border border-gray-200 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500 px-3 py-2">
                         <option>Semua Status</option>
-                        <option value="{{ request()->fullUrlWithQuery(['sort' => 'aman']) }}" @if(request()->sort == 'aman') selected @endif>Aman</option>
-                        <option value="{{ request()->fullUrlWithQuery(['sort' => 'menipis']) }}" @if(request()->sort == 'menipis') selected @endif>Menipis</option>
+                        <option value="{{ request()->fullUrlWithQuery(['sort' => 'aman']) }}"
+                            @if (request()->sort == 'aman') selected @endif>Aman</option>
+                        <option value="{{ request()->fullUrlWithQuery(['sort' => 'menipis']) }}"
+                            @if (request()->sort == 'menipis') selected @endif>Menipis</option>
                     </select>
                 </div>
             </div>
@@ -55,9 +57,8 @@
                             <th class="px-4 sm:px-6 py-3 text-center hidden md:table-cell">
                                 Status
                             </th>
-                            @if(auth()->user()->can('isSupervisor') || auth()->user()->can('isHseKantor'))
-                            <th class="px-4 sm:px-6 py-3 text-center">Validasi</th>
-                                
+                            @if (auth()->user()->can('isSupervisor') || auth()->user()->can('isHseKantor'))
+                                <th class="px-4 sm:px-6 py-3 text-center">Validasi</th>
                             @endif
                             <th class="px-4 sm:px-6 py-3 text-center hidden lg:table-cell">
                                 Terakhir Diperbarui
@@ -69,8 +70,16 @@
                     <tbody class="divide-y divide-gray-100 text-gray-700">
                         @forelse ($tools as $tool)
                             <tr class="hover:bg-gray-50 transition">
-                                <td class="px-4 sm:px-6 py-4 font-medium text-gray-800">
-                                    {{ $tool['name'] }}
+                                <td class="px-4 sm:px-6 py-4 flex items-center gap-3">
+                                    <!-- Gambar -->
+                                    <img src="{{ $tool['image_path'] ? asset('storage/' . $tool['image_path']) : 'https://png.pngtree.com/png-vector/20221125/ourmid/pngtree-no-image-available-icon-flatvector-illustration-blank-avatar-modern-vector-png-image_40962406.jpg' }}"
+                                        class="w-10 h-10 rounded-lg object-cover border">
+
+                                    <!-- Nama -->
+                                    <span class="font-medium text-gray-800">
+                                        {{ $tool['name'] }}
+                                    </span>
+
                                 </td>
 
                                 <td class="px-4 sm:px-6 py-4 text-center">
@@ -86,19 +95,21 @@
                                 </td>
 
                                 <td class="px-4 sm:px-6 py-4 text-center hidden md:table-cell">
-                                    @if ($tool['stock'] > $tool['stock_minimum'] * 0.10)
-                                        <span class="px-2 py-1 rounded-full badge bg-green-100 text-green-700">Aman</span>
-                                    @elseif ($tool['stock'] <= $tool['stock_minimum'] * 0.10)
-                                        <span class="px-2 py-1 rounded-full badge bg-yellow-100 text-yellow-700">Menipis</span>
+                                    @if ($tool['stock'] > $tool['stock_minimum'] * 0.1)
+                                        <span
+                                            class="px-2 py-1 rounded-full badge bg-green-100 text-green-700">Aman</span>
+                                    @elseif ($tool['stock'] <= $tool['stock_minimum'] * 0.1)
+                                        <span
+                                            class="px-2 py-1 rounded-full badge bg-yellow-100 text-yellow-700">Menipis</span>
                                     @else
-                                        <span class="px-2 py-1 rounded-full badge bg-rose-100 text-rose-700">Hampir Habis</span>
+                                        <span class="px-2 py-1 rounded-full badge bg-rose-100 text-rose-700">Hampir
+                                            Habis</span>
                                     @endif
                                 </td>
                                 @if (auth()->user()->can('isSupervisor') || auth()->user()->can('isHseKantor'))
-                                <td class="px-4 sm:px-6 py-4 text-center text-gray-500">
-                                    {{ $tool['validation'] }}
-                                </td>
-                                    
+                                    <td class="px-4 sm:px-6 py-4 text-center text-gray-500">
+                                        {{ $tool['validation'] }}
+                                    </td>
                                 @endif
 
                                 <td class="px-4 sm:px-6 py-4 text-center text-gray-500 hidden lg:table-cell">
@@ -125,113 +136,114 @@
                     </tbody>
                 </table>
             </div>
-<!-- Overlay -->
-        <div x-show="open" x-transition
-            class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 mt-0">
+            <!-- Overlay -->
+            <div x-show="open" x-transition
+                class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 mt-0">
 
-            <!-- Modal -->
-            <div @click.outside="open = false" x-show="open" x-transition.scale
-                class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6">
+                <!-- Modal -->
+                <div @click.outside="open = false" x-show="open" x-transition.scale
+                    class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6">
 
-                <!-- Header -->
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold text-gray-800">
-                        Transaksi Stok APD
-                    </h2>
-                    <button @click="open = false" class="text-gray-400 hover:text-gray-600">
-                        ✕
-                    </button>
-                </div>
-
-                <!-- Form -->
-                <form class="space-y-4" method="POST" action="{{ route('stock-transactions.store') }}">
-                    @csrf
-                    <!-- Select APD -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Pilih APD
-                        </label>
-                        <select name="tool_id" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
-                            @foreach ($datas as $tool)
-                                <option value="{{ $tool->id }}">{{ $tool->name }}</option>
-                            @endforeach
-                        </select>
+                    <!-- Header -->
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">
+                            Transaksi Stok APD
+                        </h2>
+                        <button @click="open = false" class="text-gray-400 hover:text-gray-600">
+                            ✕
+                        </button>
                     </div>
 
-                    <!-- Jenis Transaksi -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            Jenis Transaksi
-                        </label>
-
-                        <div class="grid grid-cols-2 gap-3">
-
-                            <!-- Stok Masuk -->
-                            <label @click="type = 'in'"
-                                :class="type === 'in' ? 'border-green-500 bg-green-50' : 'border-gray-200'"
-                                class="cursor-pointer border rounded-xl p-3 flex items-center gap-2 transition">
-                                <input type="radio" value="in" x-model="type" class="hidden" name="type">
-                                <span class="text-green-600 text-lg">⬆</span>
-                                <div>
-                                    <p class="font-medium text-gray-800">Stok Masuk</p>
-                                    <p class="text-xs text-gray-500">Penambahan stok</p>
-                                </div>
+                    <!-- Form -->
+                    <form class="space-y-4" method="POST" action="{{ route('stock-transactions.store') }}">
+                        @csrf
+                        <!-- Select APD -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Pilih APD
                             </label>
-
-                            <!-- Stok Keluar -->
-                            <label @click="type = 'out'"
-                                :class="type === 'out' ? 'border-red-500 bg-red-50' : 'border-gray-200'"
-                                class="cursor-pointer border rounded-xl p-3 flex items-center gap-2 transition">
-                                <input type="radio" value="out" x-model="type" class="hidden" name="type">
-                                <span class="text-red-600 text-lg">⬇</span>
-                                <div>
-                                    <p class="font-medium text-gray-800">Stok Keluar</p>
-                                    <p class="text-xs text-gray-500">Pengurangan stok</p>
-                                </div>
-                            </label>
-
+                            <select name="tool_id"
+                                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                                @foreach ($datas as $tool)
+                                    <option value="{{ $tool->id }}">{{ $tool->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                    </div>
 
-                    <!-- Jumlah -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Jumlah
-                        </label>
-                        <input name="quantity" type="number" min="1"
-                            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-                            placeholder="Masukkan jumlah">
-                    </div>
+                        <!-- Jenis Transaksi -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Jenis Transaksi
+                            </label>
 
-                    <!-- Keterangan -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Keterangan (opsional)
-                        </label>
-                        <textarea name="note" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" rows="2"
-                            placeholder="Contoh: pembelian baru / pemakaian proyek"></textarea>
-                    </div>
+                            <div class="grid grid-cols-2 gap-3">
 
-                    <!-- Footer -->
-                    <div class="flex justify-end gap-2 pt-4">
-                        <button type="button" @click="open = false"
-                            class="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-100">
-                            Batal
-                        </button>
+                                <!-- Stok Masuk -->
+                                <label @click="type = 'in'"
+                                    :class="type === 'in' ? 'border-green-500 bg-green-50' : 'border-gray-200'"
+                                    class="cursor-pointer border rounded-xl p-3 flex items-center gap-2 transition">
+                                    <input type="radio" value="in" x-model="type" class="hidden" name="type">
+                                    <span class="text-green-600 text-lg">⬆</span>
+                                    <div>
+                                        <p class="font-medium text-gray-800">Stok Masuk</p>
+                                        <p class="text-xs text-gray-500">Penambahan stok</p>
+                                    </div>
+                                </label>
 
-                        <button type="submit"
-                            :class="type === 'in'
-                                ?
-                                'bg-green-600 hover:bg-green-700' :
-                                'bg-red-600 hover:bg-red-700'"
-                            class="px-4 py-2 text-white rounded-lg shadow transition">
-                            Simpan
-                        </button>
-                    </div>
+                                <!-- Stok Keluar -->
+                                <label @click="type = 'out'"
+                                    :class="type === 'out' ? 'border-red-500 bg-red-50' : 'border-gray-200'"
+                                    class="cursor-pointer border rounded-xl p-3 flex items-center gap-2 transition">
+                                    <input type="radio" value="out" x-model="type" class="hidden" name="type">
+                                    <span class="text-red-600 text-lg">⬇</span>
+                                    <div>
+                                        <p class="font-medium text-gray-800">Stok Keluar</p>
+                                        <p class="text-xs text-gray-500">Pengurangan stok</p>
+                                    </div>
+                                </label>
 
-                </form>
+                            </div>
+                        </div>
+
+                        <!-- Jumlah -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Jumlah
+                            </label>
+                            <input name="quantity" type="number" min="1"
+                                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                                placeholder="Masukkan jumlah">
+                        </div>
+
+                        <!-- Keterangan -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Keterangan (opsional)
+                            </label>
+                            <textarea name="note" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500" rows="2"
+                                placeholder="Contoh: pembelian baru / pemakaian proyek"></textarea>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="flex justify-end gap-2 pt-4">
+                            <button type="button" @click="open = false"
+                                class="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-100">
+                                Batal
+                            </button>
+
+                            <button type="submit"
+                                :class="type === 'in'
+                                    ?
+                                    'bg-green-600 hover:bg-green-700' :
+                                    'bg-red-600 hover:bg-red-700'"
+                                class="px-4 py-2 text-white rounded-lg shadow transition">
+                                Simpan
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
             </div>
-        </div>
         </div>
     </div>
     <!-- Alpine Init -->
@@ -243,6 +255,6 @@
             + Transaksi Stok
         </button>
 
-        
+
     </div>
 </x-layouts.app>

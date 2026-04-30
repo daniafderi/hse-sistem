@@ -1,5 +1,5 @@
 <x-layouts.app title="Detail APD">
-    <div class="space-y-6" x-data="{openModal:false}">
+    <div class="space-y-6" x-data="{ openModal: false }">
 
         <!-- HEADER -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -27,13 +27,12 @@
                 </button>
 
                 @can('isSupervisor')
-                @if ($tool->validation === 'menunggu')
-                <button @click="openModal = true"
-                    class="w-full sm:w-auto px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-lg shadow text-sm">
-                    <i class="ri-check-line"></i> Validasi
-                </button>
-                    
-                @endif
+                    @if ($tool->validation === 'menunggu')
+                        <button @click="openModal = true"
+                            class="w-full sm:w-auto px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-lg shadow text-sm">
+                            <i class="ri-check-line"></i> Validasi
+                        </button>
+                    @endif
                 @endcan
 
                 <a href="{{ route('tools.edit', $tool) }}"
@@ -47,8 +46,14 @@
                 </a>
             </div>
         </div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white rounded-xl shadow-sm border p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-1 gap-6">
+            <div class="bg-white rounded-xl shadow-sm border p-6 flex gap-6 flex-col md:flex-row">
+                <!-- IMAGE PREVIEW -->
+                <div class="w-56 h-56 bg-gray-100 rounded-xl overflow-hidden md:mx-unset mx-auto">
+                    <img src="{{ $tool->image_path ? asset('storage/' . $tool->image_path) : 'https://png.pngtree.com/png-vector/20221125/ourmid/pngtree-no-image-available-icon-flatvector-illustration-blank-avatar-modern-vector-png-image_40962406.jpg' }}"
+                        class="w-full h-full object-cover">
+                </div>
+                <div class="flex-1">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2">
                         <i class="ri-shield-line text-indigo-500 text-xl"></i>
@@ -104,6 +109,7 @@
                             Helm pelindung standar kerja lapangan.
                         </p>
                     </div>
+                </div>
                 </div>
             </div>
             <div class="bg-white rounded-xl shadow-sm border p-6">
@@ -179,85 +185,82 @@
         </div>
 
         <!-- Delete Box -->
-            <div x-data="{ confirmDelete: false }" class="p-6 mt-6 bg-white rounded-lg shadow-sm border border-gray-100">
+        <div x-data="{ confirmDelete: false }" class="p-6 mt-6 bg-white rounded-lg shadow-sm border border-gray-100">
 
-                <div class="flex items-start sm:items-center justify-between gap-4 flex-wrap">
-                    <div class="min-w-[200px]">
-                        <h2 class="text-lg font-semibold text-gray-800">Hapus APD</h2>
-                        <p class="text-sm text-gray-500 mt-1">
-                            Menghapus APD juga akan menghapus semua peminjaman terkait.
-                        </p>
-                    </div>
-
-                    <div class="p-2 bg-red-50 rounded-lg self-start sm:self-center">
-                        <i class="ri-delete-bin-6-line text-red-500 text-xl"></i>
-                    </div>
+            <div class="flex items-start sm:items-center justify-between gap-4 flex-wrap">
+                <div class="min-w-[200px]">
+                    <h2 class="text-lg font-semibold text-gray-800">Hapus APD</h2>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Menghapus APD juga akan menghapus semua peminjaman terkait.
+                    </p>
                 </div>
 
-                <button @click="confirmDelete = true"
-                    class="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-600 transition font-medium">
-                    <i class="ri-delete-bin-line text-lg"></i> Hapus
-                </button>
-
-                <!-- Modal Konfirmasi -->
-                <div x-show="confirmDelete" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
-                    x-transition.opacity>
-
-                    <div class="bg-white w-full max-w-sm rounded-lg p-6 shadow-xl" x-transition.scale>
-
-                        <h3 class="text-lg font-semibold text-gray-800">Konfirmasi Penghapusan</h3>
-                        <p class="text-sm text-gray-500 mt-2">
-                            Apakah Anda yakin? Tindakan ini tidak dapat dibatalkan.
-                        </p>
-
-                        <div class="flex items-center justify-end gap-3 mt-6">
-
-                            <button @click="confirmDelete = false"
-                                class="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-100 transition">
-                                Batal
-                            </button>
-
-                            <form method="POST" action="{{ route('tools.destroy', $tool->id) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                    class="px-4 py-2 rounded-lg bg-red-500 text-sm text-white hover:bg-red-600 transition">
-                                    Ya, Hapus
-                                </button>
-                            </form>
-                        </div>
-
-                    </div>
+                <div class="p-2 bg-red-50 rounded-lg self-start sm:self-center">
+                    <i class="ri-delete-bin-6-line text-red-500 text-xl"></i>
                 </div>
             </div>
+
+            <button @click="confirmDelete = true"
+                class="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-600 transition font-medium">
+                <i class="ri-delete-bin-line text-lg"></i> Hapus
+            </button>
+
+            <!-- Modal Konfirmasi -->
+            <div x-show="confirmDelete" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+                x-transition.opacity>
+
+                <div class="bg-white w-full max-w-sm rounded-lg p-6 shadow-xl" x-transition.scale>
+
+                    <h3 class="text-lg font-semibold text-gray-800">Konfirmasi Penghapusan</h3>
+                    <p class="text-sm text-gray-500 mt-2">
+                        Apakah Anda yakin? Tindakan ini tidak dapat dibatalkan.
+                    </p>
+
+                    <div class="flex items-center justify-end gap-3 mt-6">
+
+                        <button @click="confirmDelete = false"
+                            class="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-100 transition">
+                            Batal
+                        </button>
+
+                        <form method="POST" action="{{ route('tools.destroy', $tool->id) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="px-4 py-2 rounded-lg bg-red-500 text-sm text-white hover:bg-red-600 transition">
+                                Ya, Hapus
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
 
         <div x-show="openModal" x-transition class="fixed inset-0 z-40 bg-black/40 flex items-center justify-center">
-    <div class="bg-white w-full max-w-md mx-4 p-6 rounded-xl">
-        <h3 class="font-semibold mb-4">Validasi APD</h3>
+            <div class="bg-white w-full max-w-md mx-4 p-6 rounded-xl">
+                <h3 class="font-semibold mb-4">Validasi APD</h3>
 
-        <form method="POST" action="{{ route('tools.validate',$tool->id) }}">
-            @csrf
-            <select name="status" class="w-full border rounded-lg mb-3 px-3 py-2">
-                <option value="">Pilih Status</option>
-                <option value="valid">Valid</option>
-                <option value="ditolak">Ditolak</option>
-            </select>
+                <form method="POST" action="{{ route('tools.validate', $tool->id) }}">
+                    @csrf
+                    <select name="status" class="w-full border rounded-lg mb-3 px-3 py-2">
+                        <option value="">Pilih Status</option>
+                        <option value="valid">Valid</option>
+                        <option value="ditolak">Ditolak</option>
+                    </select>
 
-            <textarea name="komentar" rows="3"
-                class="w-full border rounded-lg mb-4 px-3 py-2"
-                placeholder="Catatan"></textarea>
+                    <textarea name="komentar" rows="3" class="w-full border rounded-lg mb-4 px-3 py-2" placeholder="Catatan"></textarea>
 
-            <div class="flex justify-end gap-2">
-                <button type="button" @click="openModal=false"
-                    class="px-4 py-2 border rounded-lg">Batal</button>
-                <button type="submit"
-                    class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
-                    Simpan
-                </button>
+                    <div class="flex justify-end gap-2">
+                        <button type="button" @click="openModal=false"
+                            class="px-4 py-2 border rounded-lg">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
+                            Simpan
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
-    </div>
-</div>
+        </div>
     </div>
 
 </x-layouts.app>

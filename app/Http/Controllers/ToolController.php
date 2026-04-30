@@ -13,6 +13,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class ToolController extends Controller
 {
@@ -40,13 +41,13 @@ class ToolController extends Controller
             $query->whereRaw('stock <= stock_minimum * 0.1'); // default terbaru
         }
 
-        if (Gate::allows('isSupervisor')) {
+        if (Gate::allows('isSupervisor') || Gate::allows('isHseKantor')) {
             $tools = $query->paginate(10)->withQueryString();
         } else {
             $tools = $query->where('validation', 'valid')->paginate(10)->withQueryString();
         }
 
-        $datas = $query->get();
+        $datas = $query->where('validation', 'valid')->paginate(10)->withQueryString();
 
         //dd($datas);
 
@@ -69,10 +70,24 @@ class ToolController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'stock' => 'required|integer|min:0',
-            'stock_minimum' => 'required|integer|min:0'
+            'stock_minimum' => 'required|integer|min:0',
+            'image_path' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
-        $tool = Tool::create($request->only(['name', 'stock', 'stock_minimum']) + [
+        if ($request->hasFile('image_path')) {
+            $data['image_path'] = $request->file('image_path')->store('tools', 'public');
+        }
+        $tool = Tool::create($data + [
             'validation' => 'menunggu'
+        ]);
+
+        // 💾 SIMPAN TRANSAKSI
+        StockApdTransaction::create([
+            'tool_id' => $tool->id,
+            'type' => 'in',
+            'quantity' => $request->stock,
+            'note' => 'APD Baru',
+            'user_id' => auth()->id(),
+            'stock_before' => 0
         ]);
 
         $notif = Notification::create([
@@ -118,9 +133,21 @@ class ToolController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'stock' => 'required|integer|min:0',
-            'stock_minimum' => 'required|integer|min:0'
+            'stock_minimum' => 'required|integer|min:0',
+            'image_path' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
+        if ($request->hasFile('image_path')) {
+
+            // hapus gambar lama (opsional tapi bagus)
+            if ($tool->image_path && Storage::disk('public')->exists($tool->image_path)) {
+                Storage::disk('public')->delete($tool->image_path);
+            }
+
+            $data['image_path'] = $request->file('image_path')->store('tools', 'public');
+        }
         $tool->update($data);
+
+
         return redirect()->route('tools.index')->with('success', 'Alat
            diperbarui.');
     }
@@ -216,7 +243,7 @@ class ToolController extends Controller
             foreach ($tool->stockTransaction as $trx) {
 
                 $day = $tanggalMulai
-    ->diffInDays(Carbon::parse($trx->created_at), false) + 1;
+                    ->diffInDays(Carbon::parse($trx->created_at), false) + 1;
 
                 if ($day >= 1 && $day <= 6) {
 
