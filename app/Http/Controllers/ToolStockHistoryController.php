@@ -47,7 +47,7 @@ class ToolStockHistoryController extends Controller
 
         if ($apd->stock < ($apd->stock_minimum * 0.10)) {
             $notif = Notification::create([
-                'type' => 'report_created',
+                'type' => 'apd_menipis',
                 'title' => 'Stock APD Menipis',
                 'message' => 'Stock APD ' . $apd->name . ' dibawah kebutuhan pertahun',
                 'notifiable_id' => $apd->id,

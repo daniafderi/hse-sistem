@@ -26,28 +26,28 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-         View::composer('*', function ($view) {
+        View::composer('*', function ($view) {
 
-        if (auth()->check()) {
+            if (auth()->check()) {
 
-    $notifications = auth()->user()
-    ->notifications()
-    ->with('notifiable') // kalau pakai morph
-    ->orderBy('notifications.created_at', 'desc')
-    ->limit(5)
-    ->get();
+                $notifications = auth()->user()
+                    ->notifications()
+                    ->with('notifiable') // kalau pakai morph
+                    ->orderBy('notifications.created_at', 'desc')
+                    ->limit(5)
+                    ->get();
 
-    $unreadCount = auth()->user()
-        ->notifications()
-        ->wherePivot('is_read', 0) // ⬅️ gunakan 0
-        ->count();
+                $unreadCount = auth()->user()
+                    ->notifications()
+                    ->wherePivot('is_read', 0) // ⬅️ gunakan 0
+                    ->count();
 
-    $view->with([
-        'globalNotifications' => $notifications,
-        'unreadNotifCount' => $unreadCount
-    ]);
-}
-    });
+                $view->with([
+                    'globalNotifications' => $notifications,
+                    'unreadNotifCount' => $unreadCount
+                ]);
+            }
+        });
 
         Gate::define('isSupervisor', function ($user) {
             return $user->role == 'Supervisor';

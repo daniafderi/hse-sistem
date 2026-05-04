@@ -1,6 +1,6 @@
 <x-layouts.app title="Notifikasi">
-    <div class="min-h-screen bg-gray-100 p-6"
-     x-data="notificationApp()">
+<div class="min-h-screen bg-white rounded-xl shadow-md p-6"
+     x-data="notificationApp(@js($globalNotifications ?? []))">
 
     <!-- HEADER -->
     <div class="flex items-center justify-between mb-6">
@@ -36,33 +36,64 @@
         </div>
     </div>
 
-    <!-- LIST NOTIF -->
-    <div class="space-y-4">
+    <!-- LIST -->
+    <div class="space-y-3">
 
         <template x-for="notif in filteredNotifications()" :key="notif.id">
-            <div class="bg-white rounded-xl shadow p-4 flex items-start justify-between hover:shadow-md transition">
+            <div class="bg-white rounded-xl shadow-sm p-4 flex items-start justify-between 
+                        hover:shadow-md transition group"
+                 :class="!notif.is_read ? 'bg-indigo-50/60' : ''">
 
                 <!-- LEFT -->
                 <div class="flex gap-3">
-                    <div class="mt-1">
-                        <i :class="notif.read ? 'ri-checkbox-circle-line text-gray-400' : 'ri-error-warning-line text-indigo-500'"
-                           class="text-xl"></i>
+
+                    <!-- ICON -->
+                    <div>
+                        <template x-if="notif.type === 'report_created'">
+                            <div class="bg-blue-100 text-blue-600 p-2.5 rounded-xl">
+                                <i class="ri-file-list-3-line"></i>
+                            </div>
+                        </template>
+
+                        <template x-if="notif.type === 'report_validate'">
+                            <div class="bg-yellow-100 text-yellow-600 p-2.5 rounded-xl">
+                                <i class="ri-refresh-line"></i>
+                            </div>
+                        </template>
+
+                        <template x-if="notif.type === 'success'">
+                            <div class="bg-green-100 text-green-600 p-2.5 rounded-xl">
+                                <i class="ri-checkbox-circle-line"></i>
+                            </div>
+                        </template>
                     </div>
 
+                    <!-- CONTENT -->
                     <div>
                         <p class="text-sm font-semibold text-gray-800"
                            x-text="notif.title"></p>
 
-                        <p class="text-sm text-gray-600"
-                           x-text="notif.message"></p>
+                        <p class="text-sm text-gray-600 mt-1 line-clamp-2"
+                           x-text="notif.message ?? 'Tidak ada deskripsi'"></p>
 
-                        <span class="text-xs text-gray-400"
-                              x-text="notif.time"></span>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="text-xs text-gray-400"
+                                  x-text="timeAgo(notif.created_at)"></span>
+
+                            <span x-show="!notif.is_read"
+                                  class="w-2 h-2 bg-indigo-500 rounded-full"></span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- RIGHT ACTION -->
+                <!-- RIGHT -->
                 <div class="flex items-center gap-2">
+
+                    <!-- OPEN -->
+                    <a :href="getUrl(notif)"
+                       class="opacity-0 group-hover:opacity-100 text-indigo-500 text-sm transition">
+                        Buka →
+                    </a>
 
                     <!-- MARK READ -->
                     <button @click="markAsRead(notif.id)"
@@ -82,7 +113,7 @@
             </div>
         </template>
 
-        <!-- EMPTY STATE -->
+        <!-- EMPTY -->
         <div x-show="filteredNotifications().length === 0"
              class="text-center text-gray-500 py-10">
             <i class="ri-inbox-line text-4xl mb-2"></i>
@@ -93,41 +124,37 @@
 </div>
 
 <script>
-function notificationApp() {
+function notificationApp(initialData) {
+    console.log(initialData);
     return {
         search: '',
         filter: 'all',
 
-        notifications: [
-            {
-                id: 1,
-                title: 'Laporan Baru',
-                message: 'Laporan safety baru telah dibuat',
-                time: '2 menit lalu',
-                read: false
-            },
-            {
-                id: 2,
-                title: 'Data Diperbarui',
-                message: 'Laporan berhasil diupdate',
-                time: '10 menit lalu',
-                read: true
-            },
-            {
-                id: 3,
-                title: 'Validasi Selesai',
-                message: 'Laporan sudah divalidasi',
-                time: '1 jam lalu',
-                read: false
+        reportUrl: '{{ route('daily-report.show', ':id') }}',
+        apdUrl: '{{ route('tools.show', ':id') }}',
+
+        notifications: initialData,
+
+        getUrl(notif) {
+            if (notif.type === 'report_created' || notif.type === 'report_validate') {
+                return this.reportUrl.replace(':id', notif.notifiable_id);
             }
-        ],
+
+            if (notif.type.includes('apd')) {
+                return this.apdUrl.replace(':id', notif.notifiable_id);
+            }
+
+            return '#';
+        },
 
         filteredNotifications() {
             return this.notifications.filter(n => {
-                const matchSearch = n.title.toLowerCase().includes(this.search.toLowerCase());
+                const matchSearch =
+                    n.title.toLowerCase().includes(this.search.toLowerCase()) ||
+                    (n.message ?? '').toLowerCase().includes(this.search.toLowerCase());
 
                 if (this.filter === 'unread') {
-                    return !n.read && matchSearch;
+                    return !n.is_read && matchSearch;
                 }
 
                 return matchSearch;
@@ -135,16 +162,27 @@ function notificationApp() {
         },
 
         unreadCount() {
-            return this.notifications.filter(n => !n.read).length;
+            return this.notifications.filter(n => !n.is_read).length;
         },
 
         markAsRead(id) {
             const notif = this.notifications.find(n => n.id === id);
-            if (notif) notif.read = true;
+            if (notif) notif.is_read = 1;
+            console.log(initialData);
         },
 
         remove(id) {
             this.notifications = this.notifications.filter(n => n.id !== id);
+        },
+
+        timeAgo(date) {
+            const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+
+            if (seconds < 60) return 'Baru saja';
+            if (seconds < 3600) return Math.floor(seconds / 60) + ' menit lalu';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + ' jam lalu';
+
+            return Math.floor(seconds / 86400) + ' hari lalu';
         }
     }
 }

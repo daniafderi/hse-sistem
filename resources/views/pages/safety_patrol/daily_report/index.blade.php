@@ -15,10 +15,13 @@
 
                 <!-- Action -->
                 <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    @can('isHseLapangan')
+                        
                     <a href="{{ route('daily-report.create') }}"
                         class="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition">
                         <i class="ri-add-line"></i> Laporan Baru
                     </a>
+                    @endcan
 
                     <form action="{{ route('daily-report.index') }}" method="GET" class="relative w-full sm:w-56">
                         <input name="search" type="text"

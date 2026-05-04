@@ -91,7 +91,7 @@ class ToolController extends Controller
         ]);
 
         $notif = Notification::create([
-            'type' => 'apd_validate',
+            'type' => 'apd_baru',
             'title' => 'APD Baru ditambahkan',
             'message' => 'APD baru telah ditambahkan ke sistem',
             'notifiable_id' => $tool->id,

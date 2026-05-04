@@ -49,81 +49,106 @@
 
             <!-- 🔔 DROPDOWN -->
             <div x-show="open" @click.outside="open = false" x-transition
-                class="absolute right-0 mt-3 w-96 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100 z-[99]">
+    class="md:absolute fixed right-0 mt-3 md:w-96 w-full md:left-[unset] left-0 
+           bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100 z-[99]">
 
-                <!-- HEADER -->
-                <div class="flex items-center justify-between px-4 py-3 border-b">
-                    <h3 class="font-semibold text-gray-800 flex items-center gap-2">
-                        <i class="ri-notification-3-fill text-indigo-500"></i>
-                        Notifikasi
-                    </h3>
-                </div>
+    <!-- HEADER -->
+    <div class="flex items-center justify-between px-5 py-4 border-b">
+        <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+            <i class="ri-notification-3-fill text-indigo-500 text-lg"></i>
+            Notifikasi
+        </h3>
 
-                <!-- LIST -->
-                <div class="max-h-80 overflow-y-auto divide-y">
+        <button class="text-xs text-indigo-600 hover:underline">
+            Tandai semua
+        </button>
+    </div>
 
-                    <template x-for="notif in notifications" :key="notif.id" x-data="{
-                        reportUrl: '{{ route('daily-report.show', ':id') }}',
-                        apdUrl: '{{ route('tools.show', ':id') }}',
-                    
-                        getUrl(notif) {
-                            if (notif.type === 'report_created' || notif.type === 'report_validate') {
-                                return this.reportUrl.replace(':id', notif.notifiable_id);
-                            }
-                    
-                            if (notif.type === 'apd') {
-                                return this.apdUrl.replace(':id', notif.notifiable_id);
-                            }
-                    
-                            return '#';
-                        }
-                    }">
-                        <a :href="getUrl(notif)"
-                            class="flex items-start gap-3 p-4 hover:bg-gray-50 transition cursor-pointer">
+    <!-- LIST -->
+    <div class="max-h-96 overflow-y-auto space-y-1 p-2">
 
-                            <!-- ICON -->
-                            <div>
-                                <template x-if="notif.type === 'report_created'">
-                                    <div class="bg-blue-100 text-blue-600 p-2 rounded-full">
-                                        <i class="ri-file-list-3-line"></i>
-                                    </div>
-                                </template>
+        <template x-for="notif in notifications" :key="notif.id" x-data="{
+            reportUrl: '{{ route('daily-report.show', ':id') }}',
+            apdUrl: '{{ route('tools.show', ':id') }}',
 
-                                <template x-if="notif.type === 'report_validate'">
-                                    <div class="bg-yellow-100 text-yellow-600 p-2 rounded-full">
-                                        <i class="ri-refresh-line"></i>
-                                    </div>
-                                </template>
+            getUrl(notif) {
+                if (notif.type === 'report_created' || notif.type === 'report_validate') {
+                    return this.reportUrl.replace(':id', notif.notifiable_id);
+                }
 
-                                <template x-if="notif.type === 'success'">
-                                    <div class="bg-green-100 text-green-600 p-2 rounded-full">
-                                        <i class="ri-checkbox-circle-line"></i>
-                                    </div>
-                                </template>
-                            </div>
+                if (notif.type === 'apd_baru' || notif.type === 'apd_menipis' || notif.type === 'apd_validate') {
+                    return this.apdUrl.replace(':id', notif.notifiable_id);
+                }
 
-                            <!-- CONTENT -->
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-800" x-text="notif.title"></p>
+                return '#';
+            }
+        }">
 
-                                <span class="text-xs text-gray-400" x-text="timeAgo(notif.created_at)"></span>
-                            </div>
+            <a :href="getUrl(notif)"
+                class="flex items-start gap-3 p-4 rounded-xl transition-all duration-200 group
+                       hover:bg-gray-50"
+                :class="!notif.is_read ? 'bg-indigo-50/60' : ''">
 
-                            <!-- UNREAD DOT -->
-                            <div x-show="!notif.is_read" class="w-2 h-2 bg-indigo-500 rounded-full mt-2"></div>
-                        </a>
+                <!-- ICON -->
+                <div class="flex-shrink-0">
+                    <template x-if="notif.type === 'report_created'">
+                        <div class="bg-blue-100 text-blue-600 p-2.5 rounded-xl">
+                            <i class="ri-file-list-3-line text-lg"></i>
+                        </div>
                     </template>
 
+                    <template x-if="notif.type === 'report_validate'">
+                        <div class="bg-yellow-100 text-yellow-600 p-2.5 rounded-xl">
+                            <i class="ri-refresh-line text-lg"></i>
+                        </div>
+                    </template>
+
+                    <template x-if="notif.type === 'success'">
+                        <div class="bg-green-100 text-green-600 p-2.5 rounded-xl">
+                            <i class="ri-checkbox-circle-line text-lg"></i>
+                        </div>
+                    </template>
                 </div>
 
-                <!-- FOOTER -->
-                <div class="p-3 text-center border-t">
-                    <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
-                        Lihat Semua Notifikasi →
-                    </a>
+                <!-- CONTENT -->
+                <div class="flex-1 min-w-0">
+                    <!-- TITLE -->
+                    <p class="text-sm font-semibold text-gray-800 leading-snug"
+                        x-text="notif.title"></p>
+
+                    <!-- MESSAGE (BARU) -->
+                    <p class="text-xs text-gray-500 mt-1 line-clamp-2"
+                        x-text="notif.message ?? 'Tidak ada deskripsi tambahan'"></p>
+
+                    <!-- FOOT INFO -->
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs text-gray-400"
+                            x-text="timeAgo(notif.created_at)"></span>
+
+                        <span class="text-[11px] text-indigo-500 opacity-0 group-hover:opacity-100 transition">
+                            Lihat →
+                        </span>
+                    </div>
                 </div>
 
-            </div>
+                <!-- UNREAD DOT -->
+                <div x-show="!notif.is_read"
+                    class="w-2.5 h-2.5 bg-indigo-500 rounded-full mt-1 animate-pulse">
+                </div>
+            </a>
+
+        </template>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="p-4 text-center border-t bg-white/50 backdrop-blur">
+        <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+            Lihat Semua Notifikasi →
+        </a>
+    </div>
+
+</div>
         </div>
         <a href="{{ route('profile.edit') }}"
             class="flex items-center gap-2 bg-indigo-50 rounded-full px-3 py-1 hover:bg-indigo-100 cursor-pointer">
