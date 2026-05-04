@@ -115,9 +115,9 @@
                 </a>
 
                 <!-- 🔽 DROPDOWN: Safety Works -->
-                @if (auth()->user()->can('isSupervisor') || auth()->user()->can('isHseAdmin'))
+                @if (auth()->user()->can('isHseAdmin'))
                 <div x-data="{
-                    open: @json(Request::routeIs('export.*') ? true : (Request::routeIs('project.*') ? true : false))
+                    open: @json(Request::routeIs('export.*') ? true : (Request::routeIs('tool.laporan') ? true : false))
                 }">
                     <button @click="open = !open"
                         class="flex items-center justify-between w-full px-3 py-2 text-sm font-medium 
