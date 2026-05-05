@@ -315,7 +315,9 @@ if ($request->has('unsafe_condition')) {
      */
     public function destroy(DailySafetyPatrol $dailySafetyPatrol)
     {
-        //
+        $dailySafetyPatrol->delete();
+
+        return redirect()->route('daily-report.index')->with('success', 'Berhasil menghapus laporan');
     }
 
     public function validation(Request $request) {}

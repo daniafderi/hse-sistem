@@ -222,11 +222,12 @@
                     </div>
                 </div>
 
-                <!-- Submit -->
-                <div class="pt-4">
+                <!-- Tombol Submit -->
+                <div class="flex justify-end pt-4 gap-2.5">
+                    <a href="{{ url()->previous() }}" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-600 hover:text-indigo-600 hover:border-indigo-400 px-4 py-2 rounded-lg text-sm shadow-sm transition">Batal</a>
                     <button type="submit"
-                        class="bg-blue-700 text-white rounded-lg shadow-md py-2.5 px-4 w-full text-sm hover:bg-blue-600 transition">
-                        Submit
+                        class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md transition">
+                        <i class="ri-send-plane-line mr-2"></i> Submit
                     </button>
                 </div>
             </form>
