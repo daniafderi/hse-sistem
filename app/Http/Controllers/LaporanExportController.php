@@ -12,6 +12,8 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 class LaporanExportController extends Controller
 {
@@ -131,6 +133,29 @@ class LaporanExportController extends Controller
             }
         }
         $sheet->setCellValue('K1', now()->format('d M Y'));
+        $sheet->setCellValue('E5', 'Bulan : ' . $tanggalMulai->translatedFormat('F'));
+        $sheet->setCellValue('G5', 'Tahun : ' . $tanggalMulai->translatedFormat('Y'));
+
+        $headerRow = 37;
+        $startColumnIndex = 5;
+
+        for ($day = 0; $day < 7; $day++) {
+
+            // tanggal saat ini
+            $tanggal = $tanggalMulai->copy()->addDays($day);
+
+            // hitung kolom
+            $baseCol = $startColumnIndex + ($day + 1);
+
+            // convert index -> huruf excel
+            $tanggalCol = Coordinate::stringFromColumnIndex($baseCol);
+
+            // isi tanggal
+            $sheet->setCellValue(
+                $tanggalCol . $headerRow,
+                $tanggal->format('d')
+            );
+        }
         // Permit
         $gabungan = DailySafetyPatrol::where('permit', 'Gabungan')->count();
         $ketinggian = DailySafetyPatrol::where('permit', 'Ketinggian')->count();
@@ -193,15 +218,15 @@ class LaporanExportController extends Controller
             ->values();
 
         $safetyBriefing = SafetyBriefing::whereBetween('created_at', [
-                $tanggalMulai->toDateString(),
-                $tanggalAkhir->toDateString()
-            ])->get();
+            $tanggalMulai->toDateString(),
+            $tanggalAkhir->toDateString()
+        ])->get();
 
         //dd($safetyBriefing->count());
 
-        $sheet->setCellValue('E20', "=MAX(E38:E53)");
+        $sheet->setCellValue('E20', "=MAX(F54:L54)");
         $sheet->setCellValue('E21', "=SUM(E55:E70)");
-        $sheet->setCellValue('E21', $safetyBriefing->count());
+        $sheet->setCellValue('E22', $safetyBriefing->count());
         $sheet->setCellValue('E23', "=SUM(E89:E104)");
         $sheet->setCellValue('E24', "=SUM(E106:E121)");
         $sheet->setCellValue('E25', $unsafeAction->count());
@@ -216,10 +241,22 @@ class LaporanExportController extends Controller
         //dd($dataStartRowUac);
 
         foreach ($uac as $data) {
+            $imagePath = storage_path('app/public/safety_patrol/' . $data['image_url']);
             $sheetUac->setCellValue('B' . $dataStartRowUac, $data['created_at']);
             $sheetUac->setCellValue('C' . $dataStartRowUac, $data->safetyPatrol->project->lokasi);
             $sheetUac->setCellValue('D' . $dataStartRowUac, $data['text']);
-            $sheetUac->setCellValue('E' . $dataStartRowUac, $data['image_url']);
+            if (file_exists($imagePath)) {
+
+        $drawing = new Drawing();
+
+        $drawing->setPath($imagePath);
+
+        $drawing->setHeight(60);
+
+        $drawing->setCoordinates('E' . $dataStartRowUac);
+
+        $drawing->setWorksheet($sheet);
+    }
             $sheetUac->setCellValue('F' . $dataStartRowUac, $data['tindakan_perbaikan']);
             $sheetUac->setCellValue('G' . $dataStartRowUac, $data['label']);
             $sheetUac->setCellValue('H' . $dataStartRowUac, $data['status']);
@@ -414,9 +451,9 @@ class LaporanExportController extends Controller
             ->values();
 
         $safetyBriefing = SafetyBriefing::whereBetween('created_at', [
-                $start->toDateString(),
-                $end->toDateString()
-            ])->get();
+            $start->toDateString(),
+            $end->toDateString()
+        ])->get();
 
         //dd($unsafeAction->count());
 

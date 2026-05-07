@@ -219,7 +219,15 @@ class ToolController extends Controller
 
         //dd($data);
 
+        // nama bulan
+        $sheet->setCellValue('F6', 'Bulan : ' . $tanggalMulai->translatedFormat('F'));
+
+        // tahun
+        $sheet->setCellValue('K6', 'Tahun : ' . $tanggalMulai->format('Y'));
+
         $startColumnIndex = 5; // D
+
+        $headerRow = 7;
 
         foreach ($data as $index => $tool) {
 
@@ -260,8 +268,12 @@ class ToolController extends Controller
 
                 $baseCol = $startColumnIndex + (($day - 1) * 2);
 
+                $tanggal = $tanggalMulai->copy()->addDays($day - 1);
+
                 $masukCol  = Coordinate::stringFromColumnIndex($baseCol);
                 $keluarCol = Coordinate::stringFromColumnIndex($baseCol + 1);
+
+                $sheet->setCellValue($masukCol . $headerRow, $tanggal->format('d'));
 
                 $sheet->setCellValue($masukCol . $rowExcel, $val['masuk']);
                 $sheet->setCellValue($keluarCol . $rowExcel, $val['keluar']);
