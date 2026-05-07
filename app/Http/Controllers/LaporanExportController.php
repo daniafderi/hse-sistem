@@ -132,6 +132,8 @@ class LaporanExportController extends Controller
                 $exportData[] = $row;
             }
         }
+
+        //dd($exportData);
         $sheet->setCellValue('K1', now()->format('d M Y'));
         $sheet->setCellValue('E5', 'Bulan : ' . $tanggalMulai->translatedFormat('F'));
         $sheet->setCellValue('G5', 'Tahun : ' . $tanggalMulai->translatedFormat('Y'));
@@ -241,22 +243,23 @@ class LaporanExportController extends Controller
         //dd($dataStartRowUac);
 
         foreach ($uac as $data) {
-            $imagePath = storage_path('app/public/safety_patrol/' . $data['image_url']);
+            $imagePath = storage_path('app/public/' . $data['image_url']);
+            //dd($imagePath, file_exists($imagePath));
             $sheetUac->setCellValue('B' . $dataStartRowUac, $data['created_at']);
             $sheetUac->setCellValue('C' . $dataStartRowUac, $data->safetyPatrol->project->lokasi);
             $sheetUac->setCellValue('D' . $dataStartRowUac, $data['text']);
             if (file_exists($imagePath)) {
 
-        $drawing = new Drawing();
+                $drawing = new Drawing();
 
-        $drawing->setPath($imagePath);
+                $drawing->setPath($imagePath);
 
-        $drawing->setHeight(60);
+                $drawing->setHeight(150);
 
-        $drawing->setCoordinates('E' . $dataStartRowUac);
+                $drawing->setCoordinates('E' . $dataStartRowUac);
 
-        $drawing->setWorksheet($sheet);
-    }
+                $drawing->setWorksheet($sheetUac);
+            }
             $sheetUac->setCellValue('F' . $dataStartRowUac, $data['tindakan_perbaikan']);
             $sheetUac->setCellValue('G' . $dataStartRowUac, $data['label']);
             $sheetUac->setCellValue('H' . $dataStartRowUac, $data['status']);
@@ -291,15 +294,17 @@ class LaporanExportController extends Controller
         $sheetUac = $spreadsheet->getSheet(2);
         $totalDays = $start->daysInMonth;
 
+
+
         $startRow = 11;
         $data = DailySafetyPatrol::with('project')
             ->withCount('users')
-            ->whereBetween('created_at', [
+            ->whereBetween('tanggal', [
                 $start->toDateString(),
                 $end->toDateString()
             ])->get();
 
-        //dd(collect($data)->pluck('jumlah_pekerja')->sum());
+        //dd(collect($data));
 
         $grouped = $data->groupBy('project_safety_id');
         $reportTypes = [
@@ -348,6 +353,8 @@ class LaporanExportController extends Controller
         ];
         $exportData = [];
 
+        //dd($totalDays);
+
         foreach ($grouped as $projectId => $rows) {
 
             $projectName = $rows->first()->project->nama;
@@ -369,7 +376,7 @@ class LaporanExportController extends Controller
 
                     $dayIndex = $start
                         ->diffInDays(
-                            Carbon::parse($item->created_at)->startOfDay(),
+                            Carbon::parse($item->tanggal)->startOfDay(),
                             false
                         ) + 1;
 
@@ -386,6 +393,13 @@ class LaporanExportController extends Controller
             }
         }
         $sheetSummary->setCellValue('M1', now()->format('d M Y'));
+        $sheetSafetyPatrol->setCellValue('N2', now()->format('d M Y'));
+        $sheetUac->setCellValue('I1', now()->format('d M Y'));
+        $sheetSummary->setCellValue('E5', 'Bulan : ' . $start->translatedFormat('F'));
+        $sheetSummary->setCellValue('H5', 'Tahun : ' . $end->translatedFormat('Y'));
+        $sheetSafetyPatrol->setCellValue('E6', 'Bulan : ' . $start->translatedFormat('F'));
+        $sheetSafetyPatrol->setCellValue('I6', 'Tahun : ' . $end->translatedFormat('Y'));
+        $sheetUac->setCellValue('G7', 'Bulan : ' . $start->translatedFormat('F') . ' Tahun : ' . $end->translatedFormat('Y'));
         // Permit
         $gabungan = DailySafetyPatrol::where('permit', 'Gabungan')->count();
         $ketinggian = DailySafetyPatrol::where('permit', 'Ketinggian')->count();
@@ -400,11 +414,13 @@ class LaporanExportController extends Controller
         $sheetSummary->setCellValue('E32', $crane);
         $sheetSummary->setCellValue('E33', '=SUM(E28:E32)');
 
+        //dd($exportData);
         foreach ($reportMap as $reportName => $startRow) {
 
             $rows = collect($exportData)
                 ->where('daily_report', $reportName)
                 ->values();
+
 
             $rowExcel = $startRow;
             $dataStartRow = $startRow;
@@ -484,10 +500,22 @@ class LaporanExportController extends Controller
         //dd($dataStartRowUac);
 
         foreach ($uac as $data) {
+            $imagePath = storage_path('app/public/' . $data['image_url']);
             $sheetUac->setCellValue('B' . $dataStartRowUac, $data['created_at']);
             $sheetUac->setCellValue('C' . $dataStartRowUac, $data->safetyPatrol->project->lokasi);
             $sheetUac->setCellValue('D' . $dataStartRowUac, $data['text']);
-            $sheetUac->setCellValue('E' . $dataStartRowUac, $data['image_url']);
+            if (file_exists($imagePath)) {
+
+                $drawing = new Drawing();
+
+                $drawing->setPath($imagePath);
+
+                $drawing->setHeight(150);
+
+                $drawing->setCoordinates('E' . $dataStartRowUac);
+
+                $drawing->setWorksheet($sheetUac);
+            }
             $sheetUac->setCellValue('F' . $dataStartRowUac, $data['tindakan_perbaikan']);
             $sheetUac->setCellValue('G' . $dataStartRowUac, $data['label']);
             $sheetUac->setCellValue('H' . $dataStartRowUac, $data['status']);

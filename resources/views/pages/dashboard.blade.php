@@ -93,7 +93,7 @@
                     </div>
     
                     <!-- Recent Activities -->
-                    <div class="bg-white rounded-xl p-5 shadow-sm border">
+                    <div class="bg-white rounded-xl p-5 shadow-sm border hidden">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4">Aktivitas Terbaru</h3>
                         <ul class="divide-y">
                             <li class="py-3 flex items-start justify-between">
