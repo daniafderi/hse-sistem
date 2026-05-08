@@ -28,25 +28,28 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('*', function ($view) {
 
-            if (auth()->check()) {
-
-                $notifications = auth()->user()
-                    ->notifications()
-                    ->with('notifiable') // kalau pakai morph
-                    ->orderBy('notifications.created_at', 'desc')
-                    ->limit(5)
-                    ->get();
-
-                $unreadCount = auth()->user()
-                    ->notifications()
-                    ->wherePivot('is_read', 0) // ⬅️ gunakan 0
-                    ->count();
-
-                $view->with([
-                    'globalNotifications' => $notifications,
-                    'unreadNotifCount' => $unreadCount
-                ]);
+            if (!auth()->check()) {
+                return;
             }
+
+            $user = auth()->user();
+
+            $notifications = $user
+                ->notifications()
+                ->with('notifiable')
+                ->latest('notifications.created_at')
+                ->limit(5)
+                ->get();
+
+            $unreadCount = $user
+                ->notifications()
+                ->wherePivot('is_read', false)
+                ->count();
+
+            $view->with([
+                'globalNotifications' => $notifications,
+                'unreadNotifCount' => $unreadCount,
+            ]);
         });
 
         Gate::define('isSupervisor', function ($user) {

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class NotificationController extends Controller
 {
@@ -60,5 +62,33 @@ class NotificationController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function readAll()
+    {
+        DB::table('notification_users')
+            ->where('user_id', auth()->id())
+            ->where('is_read', false)
+            ->update([
+                'is_read' => true,
+                'read_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        return back();
+    }
+
+    public function markAsRead(Notification $notification)
+    {
+        DB::table('notification_users')
+            ->where('user_id', auth()->id())
+            ->where('notification_id', $notification->id)
+            ->update([
+                'is_read' => true,
+                'read_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        return back();
     }
 }

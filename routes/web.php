@@ -21,26 +21,34 @@ Route::get('/', function () {
 });
 
 Route::get('/download/template/{file}', [SafetyBriefingController::class, 'download'])
-->where('file', '.*')
-->name('download.template');
+    ->where('file', '.*')
+    ->name('download.template');
 
 Route::middleware('auth')->group(function () {
+    Route::post(
+        '/notifications/read-all',
+        [NotificationController::class, 'readAll']
+    )->name('notifications.read-all');
+    Route::post(
+        '/notifications/{notification}/read',
+        [NotificationController::class, 'markAsRead']
+    )->name('notifications.read');
     Route::get('/laporan/export', [LaporanExportController::class, 'export'])->name('laporan.export');
     Route::get('/export/laporan', [LaporanExportController::class, 'index'])->name('export.index');
     Route::get('/tool/laporan', [ToolController::class, 'export'])->name('tool.laporan');
     Route::get('/tool/export', [ToolController::class, 'download'])->name('tool.export');
     Route::post('/stock-transactions', [ToolStockHistoryController::class, 'store'])
-    ->name('stock-transactions.store');
+        ->name('stock-transactions.store');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/notification-all', [NotificationController::class, 'index'])->name('notify.all');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notify.all');
     Route::resource('/user', UserController::class)->middleware('can:isHseAdmin');
     Route::post('/user/{user}/reset-password', [UserController::class, 'resetPassword'])->name('user.resetPassword')->middleware('can:isHseAdmin');
     Route::prefix('/safety-patrol')->group(function () {
         Route::resource('/project', ProjectSafetyController::class);
         Route::get('/project/{id}/export', [ProjectSafetyController::class, 'exportCsv'])->name('project.export.single');
         Route::resource('/daily-report', DailySafetyPatrolController::class)->parameters([
-        'daily-report' => 'dailySafetyPatrol'
-    ]);
+            'daily-report' => 'dailySafetyPatrol'
+        ]);
         Route::post(
             '/daily-report/{report}/validate',
             [ValidationSafetyPatrolController::class, 'store']
