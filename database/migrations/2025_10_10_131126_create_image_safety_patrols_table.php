@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('image_safety_patrols', function (Blueprint $table) {
             $table->id();
             $table->string('image_url')->nullable();
-            $table->foreignId('daily_safety_patrol_id');
+            $table->foreignId('daily_safety_patrol_id')->constrained()->cascadeOnDelete();
             $table->string('label');
             $table->string('text')->nullable();
             $table->string('status')->nullable();
