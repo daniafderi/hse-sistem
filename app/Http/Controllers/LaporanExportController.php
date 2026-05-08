@@ -246,23 +246,33 @@ class LaporanExportController extends Controller
         //dd($dataStartRowUac);
 
         foreach ($uac as $data) {
-            $imagePath = storage_path('app/public/' . $data['image_url']);
+            $imageUrl = $data['image_url'] ?? null;
+            if ($imageUrl) {
+
+                $imagePath = storage_path(
+                    'app/public/' . $imageUrl
+                );
+
+                if (file_exists($imagePath)) {
+
+                    $drawing = new Drawing();
+
+                    $drawing->setPath($imagePath);
+
+                    $drawing->setHeight(150);
+
+                    $drawing->setCoordinates(
+                        'E' . $dataStartRowUac
+                    );
+
+                    $drawing->setWorksheet($sheetUac);
+                }
+            }
             //dd($imagePath, file_exists($imagePath));
             $sheetUac->setCellValue('B' . $dataStartRowUac, $data['created_at']);
             $sheetUac->setCellValue('C' . $dataStartRowUac, $data->safetyPatrol->project->lokasi);
             $sheetUac->setCellValue('D' . $dataStartRowUac, $data['text']);
-            if (file_exists($imagePath)) {
 
-                $drawing = new Drawing();
-
-                $drawing->setPath($imagePath);
-
-                $drawing->setHeight(150);
-
-                $drawing->setCoordinates('E' . $dataStartRowUac);
-
-                $drawing->setWorksheet($sheetUac);
-            }
             $sheetUac->setCellValue('F' . $dataStartRowUac, $data['tindakan_perbaikan']);
             $sheetUac->setCellValue('G' . $dataStartRowUac, $data['label']);
             $sheetUac->setCellValue('H' . $dataStartRowUac, $data['status']);
@@ -532,22 +542,31 @@ class LaporanExportController extends Controller
         //dd($dataStartRowUac);
 
         foreach ($uac as $data) {
-            $imagePath = storage_path('app/public/' . $data['image_url']);
+            $imageUrl = $data['image_url'] ?? null;
+            if ($imageUrl) {
+
+                $imagePath = storage_path(
+                    'app/public/' . $imageUrl
+                );
+
+                if (file_exists($imagePath)) {
+
+                    $drawing = new Drawing();
+
+                    $drawing->setPath($imagePath);
+
+                    $drawing->setHeight(150);
+
+                    $drawing->setCoordinates(
+                        'E' . $dataStartRowUac
+                    );
+
+                    $drawing->setWorksheet($sheetUac);
+                }
+            }
             $sheetUac->setCellValue('B' . $dataStartRowUac, $data['created_at']);
             $sheetUac->setCellValue('C' . $dataStartRowUac, $data->safetyPatrol->project->lokasi);
             $sheetUac->setCellValue('D' . $dataStartRowUac, $data['text']);
-            if (file_exists($imagePath)) {
-
-                $drawing = new Drawing();
-
-                $drawing->setPath($imagePath);
-
-                $drawing->setHeight(150);
-
-                $drawing->setCoordinates('E' . $dataStartRowUac);
-
-                $drawing->setWorksheet($sheetUac);
-            }
             $sheetUac->setCellValue('F' . $dataStartRowUac, $data['tindakan_perbaikan']);
             $sheetUac->setCellValue('G' . $dataStartRowUac, $data['label']);
             $sheetUac->setCellValue('H' . $dataStartRowUac, $data['status']);
