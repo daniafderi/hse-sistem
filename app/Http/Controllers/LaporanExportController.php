@@ -35,8 +35,9 @@ class LaporanExportController extends Controller
     {
         $templatePath = storage_path('app/public/templates/weekly-report.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
-        $sheet = $spreadsheet->getActiveSheet();
+        $sheet = $spreadsheet->getSheet(0);
         $sheetUac = $spreadsheet->getSheet(1);
+        $sheetSb = $spreadsheet->getSheet(2);
         $tanggalMulai = Carbon::parse($request->tanggal_mulai);
         $tanggalAkhir = $tanggalMulai->copy()->addDays(6);
 
@@ -88,10 +89,10 @@ class LaporanExportController extends Controller
         $reportMap = [
             'Man Power'   => 38,
             'Man Hour'    => 55,
-            'Nearmiss'    => 89,
-            'Kecelakaan'  => 106,
-            'Reward'      => 123,
-            'Punishment'  => 140,
+            'Nearmiss'    => 72,
+            'Kecelakaan'  => 89,
+            'Reward'      => 106,
+            'Punishment'  => 123,
         ];
         $exportData = [];
 
@@ -135,6 +136,8 @@ class LaporanExportController extends Controller
 
         //dd($exportData);
         $sheet->setCellValue('K1', now()->format('d M Y'));
+        $sheetUac->setCellValue('I1', now()->format('d M Y'));
+        $sheetSb->setCellValue('I1', now()->format('d M Y'));
         $sheet->setCellValue('E5', 'Bulan : ' . $tanggalMulai->translatedFormat('F'));
         $sheet->setCellValue('G5', 'Tahun : ' . $tanggalMulai->translatedFormat('Y'));
 
@@ -219,7 +222,7 @@ class LaporanExportController extends Controller
             ->where('label', 'uc')
             ->values();
 
-        $safetyBriefing = SafetyBriefing::whereBetween('created_at', [
+        $safetyBriefing = SafetyBriefing::with('images')->whereBetween('created_at', [
             $tanggalMulai->toDateString(),
             $tanggalAkhir->toDateString()
         ])->get();
@@ -236,7 +239,7 @@ class LaporanExportController extends Controller
         $sheet->setCellValue('E27', "=SUM(E123:E138)");
         $sheet->setCellValue('E28', "=SUM(E140:E155)");
 
-        //dd($uac);
+        //dd($safetyBriefing);
 
         $dataStartRowUac = 10;
 
@@ -267,6 +270,33 @@ class LaporanExportController extends Controller
             $dataStartRowUac++;
         }
 
+        $dataStartRowSb = 10;
+
+        foreach ($safetyBriefing as $data) {
+            $image = $data->images->first();
+            $imagePath = storage_path('app/public/' . $data->images->first()?->image_url);
+
+            $sheetSb->setCellValue('B' . $dataStartRowSb, $data['created_at']->format('d M Y'));
+            $sheetSb->setCellValue('C' . $dataStartRowSb, $data['tempat']);
+            $sheetSb->setCellValue('D' . $dataStartRowSb, $data['pekerjaan']);
+            $sheetSb->setCellValue('E' . $dataStartRowSb, $data['jumlah_peserta']);
+            $sheetSb->setCellValue('F' . $dataStartRowSb, $data['catatan']);
+            if ($image) {
+
+                $drawing = new Drawing();
+
+                $drawing->setPath($imagePath);
+
+                $drawing->setHeight(150);
+
+                $drawing->setCoordinates('G' . $dataStartRowUac);
+
+                $drawing->setWorksheet($sheetSb);
+            }
+
+            $dataStartRowSb++;
+        }
+
         return new StreamedResponse(function () use ($spreadsheet) {
             $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
             $writer->save('php://output');
@@ -292,6 +322,7 @@ class LaporanExportController extends Controller
         $sheetSummary = $spreadsheet->getActiveSheet();
         $sheetSafetyPatrol = $spreadsheet->getSheet(1);
         $sheetUac = $spreadsheet->getSheet(2);
+        $sheetSb = $spreadsheet->getSheet(3);
         $totalDays = $start->daysInMonth;
 
 
@@ -346,10 +377,10 @@ class LaporanExportController extends Controller
         $reportMap = [
             'Man Power'   => 11,
             'Man Hour'    => 15,
-            'Nearmiss'    => 23,
-            'Kecelakaan'  => 27,
-            'Reward'      => 31,
-            'Punishment'  => 35,
+            'Nearmiss'    => 19,
+            'Kecelakaan'  => 23,
+            'Reward'      => 27,
+            'Punishment'  => 31,
         ];
         $exportData = [];
 
@@ -400,6 +431,7 @@ class LaporanExportController extends Controller
         $sheetSafetyPatrol->setCellValue('E6', 'Bulan : ' . $start->translatedFormat('F'));
         $sheetSafetyPatrol->setCellValue('I6', 'Tahun : ' . $end->translatedFormat('Y'));
         $sheetUac->setCellValue('G7', 'Bulan : ' . $start->translatedFormat('F') . ' Tahun : ' . $end->translatedFormat('Y'));
+        $sheetSb->setCellValue('I1', now()->format('d M Y'));
         // Permit
         $gabungan = DailySafetyPatrol::where('permit', 'Gabungan')->count();
         $ketinggian = DailySafetyPatrol::where('permit', 'Ketinggian')->count();
@@ -466,7 +498,7 @@ class LaporanExportController extends Controller
             ->where('label', 'uc')
             ->values();
 
-        $safetyBriefing = SafetyBriefing::whereBetween('created_at', [
+        $safetyBriefing = SafetyBriefing::with('images')->whereBetween('created_at', [
             $start->toDateString(),
             $end->toDateString()
         ])->get();
@@ -521,6 +553,33 @@ class LaporanExportController extends Controller
             $sheetUac->setCellValue('H' . $dataStartRowUac, $data['status']);
 
             $dataStartRowUac++;
+        }
+
+        $dataStartRowSb = 10;
+
+        foreach ($safetyBriefing as $data) {
+            $image = $data->images->first();
+            $imagePath = storage_path('app/public/' . $data->images->first()?->image_url);
+
+            $sheetSb->setCellValue('B' . $dataStartRowSb, $data['created_at']->format('d M Y'));
+            $sheetSb->setCellValue('C' . $dataStartRowSb, $data['tempat']);
+            $sheetSb->setCellValue('D' . $dataStartRowSb, $data['pekerjaan']);
+            $sheetSb->setCellValue('E' . $dataStartRowSb, $data['jumlah_peserta']);
+            $sheetSb->setCellValue('F' . $dataStartRowSb, $data['catatan']);
+            if ($image) {
+
+                $drawing = new Drawing();
+
+                $drawing->setPath($imagePath);
+
+                $drawing->setHeight(150);
+
+                $drawing->setCoordinates('G' . $dataStartRowUac);
+
+                $drawing->setWorksheet($sheetSb);
+            }
+
+            $dataStartRowSb++;
         }
 
         return new StreamedResponse(function () use ($spreadsheet) {
