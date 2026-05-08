@@ -98,7 +98,7 @@ class LaporanExportController extends Controller
 
         foreach ($grouped as $projectId => $rows) {
 
-            $projectName = $rows->first()->project->nama;
+            $projectName = $rows->first()?->project?->nama ?? '-';
 
             foreach ($reportTypes as $report) {
 
@@ -180,6 +180,11 @@ class LaporanExportController extends Controller
             $rows = collect($exportData)
                 ->where('daily_report', $reportName)
                 ->values();
+
+            // SKIP kalau kosong
+            if ($rows->isEmpty()) {
+                continue;
+            }
 
             $rowExcel = $startRow;
             $dataStartRow = $startRow;
@@ -270,7 +275,7 @@ class LaporanExportController extends Controller
             }
             //dd($imagePath, file_exists($imagePath));
             $sheetUac->setCellValue('B' . $dataStartRowUac, $data['created_at']);
-            $sheetUac->setCellValue('C' . $dataStartRowUac, $data->safetyPatrol->project->lokasi);
+            $sheetUac->setCellValue('C' . $dataStartRowUac, $data->safetyPatrol?->project?->lokasi ?? '-');
             $sheetUac->setCellValue('D' . $dataStartRowUac, $data['text']);
 
             $sheetUac->setCellValue('F' . $dataStartRowUac, $data['tindakan_perbaikan']);
@@ -284,25 +289,34 @@ class LaporanExportController extends Controller
 
         foreach ($safetyBriefing as $data) {
             $image = $data->images->first();
-            $imagePath = storage_path('app/public/' . $data->images->first()?->image_url);
+
+            if ($image) {
+
+                $imagePath = storage_path(
+                    'app/public/' . $image->image_url
+                );
+
+                if (is_file($imagePath)) {
+
+                    $drawing = new Drawing();
+
+                    $drawing->setPath($imagePath);
+
+                    $drawing->setHeight(150);
+
+                    $drawing->setCoordinates(
+                        'G' . $dataStartRowSb
+                    );
+
+                    $drawing->setWorksheet($sheetSb);
+                }
+            }
 
             $sheetSb->setCellValue('B' . $dataStartRowSb, $data['created_at']->format('d M Y'));
             $sheetSb->setCellValue('C' . $dataStartRowSb, $data['tempat']);
             $sheetSb->setCellValue('D' . $dataStartRowSb, $data['pekerjaan']);
             $sheetSb->setCellValue('E' . $dataStartRowSb, $data['jumlah_peserta']);
             $sheetSb->setCellValue('F' . $dataStartRowSb, $data['catatan']);
-            if ($image) {
-
-                $drawing = new Drawing();
-
-                $drawing->setPath($imagePath);
-
-                $drawing->setHeight(150);
-
-                $drawing->setCoordinates('G' . $dataStartRowUac);
-
-                $drawing->setWorksheet($sheetSb);
-            }
 
             $dataStartRowSb++;
         }
@@ -398,7 +412,7 @@ class LaporanExportController extends Controller
 
         foreach ($grouped as $projectId => $rows) {
 
-            $projectName = $rows->first()->project->nama;
+            $projectName = $rows->first()?->project?->nama ?? '-';
 
             foreach ($reportTypes as $report) {
 
@@ -463,6 +477,10 @@ class LaporanExportController extends Controller
                 ->where('daily_report', $reportName)
                 ->values();
 
+            // SKIP kalau kosong
+            if ($rows->isEmpty()) {
+                continue;
+            }
 
             $rowExcel = $startRow;
             $dataStartRow = $startRow;
@@ -565,7 +583,7 @@ class LaporanExportController extends Controller
                 }
             }
             $sheetUac->setCellValue('B' . $dataStartRowUac, $data['created_at']);
-            $sheetUac->setCellValue('C' . $dataStartRowUac, $data->safetyPatrol->project->lokasi);
+            $sheetUac->setCellValue('C' . $dataStartRowUac, $data->safetyPatrol?->project?->lokasi ?? '-');
             $sheetUac->setCellValue('D' . $dataStartRowUac, $data['text']);
             $sheetUac->setCellValue('F' . $dataStartRowUac, $data['tindakan_perbaikan']);
             $sheetUac->setCellValue('G' . $dataStartRowUac, $data['label']);
@@ -578,25 +596,34 @@ class LaporanExportController extends Controller
 
         foreach ($safetyBriefing as $data) {
             $image = $data->images->first();
-            $imagePath = storage_path('app/public/' . $data->images->first()?->image_url);
+
+            if ($image) {
+
+                $imagePath = storage_path(
+                    'app/public/' . $image->image_url
+                );
+
+                if (is_file($imagePath)) {
+
+                    $drawing = new Drawing();
+
+                    $drawing->setPath($imagePath);
+
+                    $drawing->setHeight(150);
+
+                    $drawing->setCoordinates(
+                        'G' . $dataStartRowSb
+                    );
+
+                    $drawing->setWorksheet($sheetSb);
+                }
+            }
 
             $sheetSb->setCellValue('B' . $dataStartRowSb, $data['created_at']->format('d M Y'));
             $sheetSb->setCellValue('C' . $dataStartRowSb, $data['tempat']);
             $sheetSb->setCellValue('D' . $dataStartRowSb, $data['pekerjaan']);
             $sheetSb->setCellValue('E' . $dataStartRowSb, $data['jumlah_peserta']);
             $sheetSb->setCellValue('F' . $dataStartRowSb, $data['catatan']);
-            if ($image) {
-
-                $drawing = new Drawing();
-
-                $drawing->setPath($imagePath);
-
-                $drawing->setHeight(150);
-
-                $drawing->setCoordinates('G' . $dataStartRowUac);
-
-                $drawing->setWorksheet($sheetSb);
-            }
 
             $dataStartRowSb++;
         }
