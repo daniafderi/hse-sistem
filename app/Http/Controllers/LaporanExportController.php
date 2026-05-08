@@ -54,7 +54,7 @@ class LaporanExportController extends Controller
             [
                 'label' => 'Man Power',
                 'type'  => 'numeric',
-                'value' => fn($item) => (int) $item->jumlah_pekerja,
+                'value' => fn($item) => (int) $item->jumlah_pekerja + $item->users_count,
             ],
             [
                 'label' => 'Man Hour',
@@ -352,7 +352,7 @@ class LaporanExportController extends Controller
             [
                 'label' => 'Man Power',
                 'type'  => 'numeric',
-                'value' => fn($item) => (int) $item->jumlah_pekerja,
+                'value' => fn($item) => (int) $item->jumlah_pekerja + $item->users_count,
             ],
             [
                 'label' => 'Man Hour',
