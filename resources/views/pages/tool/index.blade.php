@@ -246,15 +246,5 @@
             </div>
         </div>
     </div>
-    <!-- Alpine Init -->
-    <div x-data="{ open: false, type: 'in' }" class="p-6">
 
-        <!-- Button Open Modal -->
-        <button @click="open = true"
-            class="px-5 py-2.5 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition">
-            + Transaksi Stok
-        </button>
-
-
-    </div>
 </x-layouts.app>
