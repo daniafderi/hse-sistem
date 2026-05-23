@@ -151,7 +151,7 @@
           </form>
 
           {{-- small footer --}}
-          <p class="mt-6 text-center text-xs text-gray-400">
+          <p class="mt-6 text-center text-xs text-gray-400 hidden">
             Dengan masuk, kamu setuju dengan <a href="#" class="text-indigo-600 underline">Syarat & Ketentuan</a>.
           </p>
         </div>

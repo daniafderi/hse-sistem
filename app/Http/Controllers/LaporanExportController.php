@@ -274,7 +274,7 @@ class LaporanExportController extends Controller
                 }
             }
             //dd($imagePath, file_exists($imagePath));
-            $sheetUac->setCellValue('B' . $dataStartRowUac, $data['created_at']);
+            $sheetUac->setCellValue('B' . $dataStartRowUac, $data->safetyPatrol['tanggal']);
             $sheetUac->setCellValue('C' . $dataStartRowUac, $data->safetyPatrol?->project?->lokasi ?? '-');
             $sheetUac->setCellValue('D' . $dataStartRowUac, $data['text']);
 
@@ -582,7 +582,7 @@ class LaporanExportController extends Controller
                     $drawing->setWorksheet($sheetUac);
                 }
             }
-            $sheetUac->setCellValue('B' . $dataStartRowUac, $data['created_at']);
+            $sheetUac->setCellValue('B' . $dataStartRowUac, $data->safetyPatrol['tanggal']);
             $sheetUac->setCellValue('C' . $dataStartRowUac, $data->safetyPatrol?->project?->lokasi ?? '-');
             $sheetUac->setCellValue('D' . $dataStartRowUac, $data['text']);
             $sheetUac->setCellValue('F' . $dataStartRowUac, $data['tindakan_perbaikan']);
