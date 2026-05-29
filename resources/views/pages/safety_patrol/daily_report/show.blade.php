@@ -30,10 +30,13 @@
                         </button>
                     @endcan
 
+                    @can('manage-report', $dailyReport)
                     <a href="{{ route('daily-report.edit', $dailyReport) }}"
                         class="flex items-center gap-2 bg-white border border-gray-300 text-gray-600 hover:text-indigo-600 hover:border-indigo-400 px-4 py-2 rounded-lg text-sm shadow-sm transition w-full sm:w-auto justify-center">
                         <i class="ri-edit-line"></i> Edit
                     </a>
+                        
+                    @endcan
 
                     <a href="{{ route('daily-report.index') }}"
                         class="flex items-center gap-2 bg-white border border-gray-300 text-gray-600 hover:text-indigo-600 hover:border-indigo-400 px-4 py-2 rounded-lg text-sm shadow-sm transition w-full sm:w-auto justify-center">
@@ -223,6 +226,8 @@
 
 
             <!-- ================= MODAL VALIDASI ================= -->
+            @can('manage-report', $dailyReport)
+                
             <div x-show="openModal" x-transition
                 class="fixed inset-0 z-40 bg-black/40 flex items-center justify-center">
                 <div class="bg-white w-full max-w-md mx-4 p-6 rounded-xl">
@@ -302,6 +307,7 @@
                     </div>
                 </div>
             </div>
+            @endcan
 
             <!-- ================= IMAGE PREVIEW ================= -->
             <div x-show="preview" x-transition

@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
+use App\Models\DailySafetyPatrol;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -69,5 +70,10 @@ class AppServiceProvider extends ServiceProvider
             fn($user) =>
             in_array($user->role, ['Supervisor', 'HSE Lapangan'])
         );
+        Gate::define('manage-report', function($user, DailySafetyPatrol $dailySafetyPatrol) {
+            return $dailySafetyPatrol->users()
+            ->where('user_id', $user->id)
+            ->exists();
+        });
     }
 }

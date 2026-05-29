@@ -16,7 +16,7 @@
             </div>
 
             <!-- Daftar Item -->
-            <div x-data="loanForm(); @js($tools)" class="space-y-3">
+            <div x-data="loanForm(@js($tools))" class="space-y-3">
                 <template x-for="(item, idx) in items" :key="idx">
                     <div
                         class="grid grid-cols-12 gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm relative">
@@ -49,7 +49,7 @@
                 </template>
 
                 <!-- Tombol Tambah Item -->
-                <button type="button" @click="add()" :disabled="items.length = tools.length"
+                <button type="button" @click="add()" :disabled="selectedTools().length >= tools.length"
                     class="px-4 py-2 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded-lg font-medium transition disabled:bg-gray-300 disabled:cursor-not-allowed"">
                     + Tambah Item
                 </button>
@@ -75,23 +75,33 @@
     </div>
 
     <script>
-        function loanForm() {
-            return {
-                items: [{
-                    tool_id: '{{ request('tool_id') ?? '' }}',
+        function loanForm(tools) {
+        return {
+            tools,
+
+            items: [{
+                tool_id: '{{ request('tool_id') ?? '' }}',
+                quantity: 1
+            }],
+
+            add() {
+                this.items.push({
+                    tool_id: '',
                     quantity: 1
-                }],
-                add() {
-                    this.items.push({
-                        tool_id: '',
-                        quantity: 1
-                    })
-                },
-                remove(i) {
-                    this.items.splice(i, 1)
-                }
-            }
+                })
+            },
+
+            remove(i) {
+                this.items.splice(i, 1)
+            },
+
+            selectedTools() {
+    return this.items
+        .map(i => i.tool_id)
+        .filter(Boolean)
+}
         }
+    }
     </script>
 
 </x-layouts.app>

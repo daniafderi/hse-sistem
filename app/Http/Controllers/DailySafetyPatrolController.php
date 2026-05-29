@@ -153,18 +153,18 @@ class DailySafetyPatrolController extends Controller
         $patrol->users()->sync($userIds);
 
         $notif = Notification::create([
-    'type' => 'report_created',
-    'title' => 'Laporan Baru',
-    'message' => 'Laporan baru telah dibuat',
-    'notifiable_id' => $patrol->id,
-    'notifiable_type' => DailySafetyPatrol::class,
-    'created_by' => auth()->id()
-]);
+            'type' => 'report_created',
+            'title' => 'Laporan Baru',
+            'message' => 'Laporan baru telah dibuat',
+            'notifiable_id' => $patrol->id,
+            'notifiable_type' => DailySafetyPatrol::class,
+            'created_by' => auth()->id()
+        ]);
 
-$users = User::whereIn('role', ['HSE Lapangan', 'Supervisor'])->pluck('id');
+        $users = User::whereIn('role', ['HSE Lapangan', 'Supervisor'])->pluck('id');
 
-// kirim ke user tertentu
-$notif->users()->attach($users);
+        // kirim ke user tertentu
+        $notif->users()->attach($users);
 
         return redirect()
             ->route('daily-report.index')
@@ -210,6 +210,9 @@ $notif->users()->attach($users);
      */
     public function update(DailySafetyPatrolRequest $request, DailySafetyPatrol $dailySafetyPatrol)
     {
+
+        Gate::authorize('manage-report', $dailySafetyPatrol);
+
         $dailySafety = $request->validated();
 
         // ===============================
@@ -218,82 +221,106 @@ $notif->users()->attach($users);
         $dailySafetyPatrol->update($dailySafety);
 
         // ===============================
-        // 2. Hapus data lama (UA & UC)
+        // 2. Simpan image lama
         // ===============================
+        $oldImages = $dailySafetyPatrol->images->keyBy('id');
 
-        // ambil semua image lama
-$existingImages = $dailySafetyPatrol->images->keyBy('id');
+        // hapus relasi lama di database
+        $dailySafetyPatrol->images()->delete();
 
-// reset dulu (opsional kalau mau full replace)
-$dailySafetyPatrol->images()->delete();
-if ($request->has('unsafe_action')) {
+        // ===============================
+        // 3. Unsafe Action
+        // ===============================
+        if ($request->has('unsafe_action')) {
 
-    foreach ($request->unsafe_action as $item) {
-    
-        if (
-            empty(trim($item['text'] ?? '')) &&
-            empty($item['images'][0] ?? null)
-        ) {
-            continue;
-        }
-    
-        $imagePath = $item['old_image'] ?? null; // 🔥 pakai image lama
-    
-        // kalau ada upload baru → replace
-        if (!empty($item['images'][0])) {
-    
-            // hapus file lama
-            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
+            foreach ($request->unsafe_action as $item) {
+
+                if (
+                    empty(trim($item['text'] ?? '')) &&
+                    empty($item['images'][0] ?? null)
+                ) {
+                    continue;
+                }
+
+                $imagePath = $item['old_image'] ?? null;
+
+                // =====================================
+                // jika upload gambar baru
+                // =====================================
+                if (!empty($item['images'][0])) {
+
+                    // cek file lama benar-benar ada
+                    if (
+                        !empty($imagePath) &&
+                        Storage::disk('public')->exists($imagePath)
+                    ) {
+                        Storage::disk('public')->delete($imagePath);
+                    }
+
+                    // upload file baru
+                    $imagePath = $item['images'][0]
+                        ->store('safety_patrol', 'public');
+                }
+
+                ImageSafetyPatrol::create([
+                    'daily_safety_patrol_id' => $dailySafetyPatrol->id,
+                    'text' => $item['text'] ?? null,
+                    'image_url' => $imagePath,
+                    'label' => 'ua',
+                    'status' => !empty($item['tindakan_perbaikan'])
+                        ? 'Selesai'
+                        : '',
+                    'tindakan_perbaikan' => $item['tindakan_perbaikan'] ?? '',
+                ]);
             }
-    
-            $imagePath = $item['images'][0]->store('safety_patrol', 'public');
         }
-    
-        ImageSafetyPatrol::create([
-            'daily_safety_patrol_id' => $dailySafetyPatrol->id,
-            'text' => $item['text'] ?? null,
-            'image_url' => $imagePath,
-            'label' => 'ua',
-            'status' => !empty($item['tindakan_perbaikan']) ? 'Selesai' : '',
-            'tindakan_perbaikan' => $item['tindakan_perbaikan'] ?? '',
-        ]);
-    }
-}
-if ($request->has('unsafe_condition')) {
 
-    foreach ($request->unsafe_condition as $item) {
-    
-        if (
-            empty(trim($item['text'] ?? '')) &&
-            empty($item['images'][0] ?? null)
-        ) {
-            continue;
-        }
-    
-        $imagePath = $item['old_image'] ?? null; // 🔥 pakai image lama
-    
-        // kalau ada upload baru → replace
-        if (!empty($item['images'][0])) {
-    
-            // hapus file lama
-            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
+        // ===============================
+        // 4. Unsafe Condition
+        // ===============================
+        if ($request->has('unsafe_condition')) {
+
+            foreach ($request->unsafe_condition as $item) {
+
+                if (
+                    empty(trim($item['text'] ?? '')) &&
+                    empty($item['images'][0] ?? null)
+                ) {
+                    continue;
+                }
+
+                $imagePath = $item['old_image'] ?? null;
+
+                // =====================================
+                // jika upload gambar baru
+                // =====================================
+                if (!empty($item['images'][0])) {
+
+                    // cek file lama benar-benar ada
+                    if (
+                        !empty($imagePath) &&
+                        Storage::disk('public')->exists($imagePath)
+                    ) {
+                        Storage::disk('public')->delete($imagePath);
+                    }
+
+                    // upload file baru
+                    $imagePath = $item['images'][0]
+                        ->store('safety_patrol', 'public');
+                }
+
+                ImageSafetyPatrol::create([
+                    'daily_safety_patrol_id' => $dailySafetyPatrol->id,
+                    'text' => $item['text'] ?? null,
+                    'image_url' => $imagePath,
+                    'label' => 'uc',
+                    'status' => !empty($item['tindakan_perbaikan'])
+                        ? 'Selesai'
+                        : '',
+                    'tindakan_perbaikan' => $item['tindakan_perbaikan'] ?? '',
+                ]);
             }
-    
-            $imagePath = $item['images'][0]->store('safety_patrol', 'public');
         }
-    
-        ImageSafetyPatrol::create([
-            'daily_safety_patrol_id' => $dailySafetyPatrol->id,
-            'text' => $item['text'] ?? null,
-            'image_url' => $imagePath,
-            'label' => 'uc',
-            'status' => !empty($item['tindakan_perbaikan']) ? 'Selesai' : '',
-            'tindakan_perbaikan' => $item['tindakan_perbaikan'] ?? '',
-        ]);
-    }
-}
 
         // ===============================
         // 5. Sync Users
@@ -315,6 +342,8 @@ if ($request->has('unsafe_condition')) {
      */
     public function destroy(DailySafetyPatrol $dailySafetyPatrol)
     {
+        Gate::define('manage-report', $dailySafetyPatrol);
+
         $dailySafetyPatrol->delete();
 
         return redirect()->route('daily-report.index')->with('success', 'Berhasil menghapus laporan');
