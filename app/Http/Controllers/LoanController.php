@@ -9,6 +9,7 @@ use App\Models\ReturnRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Exception;
 
 
 class LoanController extends Controller
@@ -41,26 +42,51 @@ class LoanController extends Controller
             'items.*.tool_id' => 'required|exists:tools,id',
             'items.*.quantity' => 'required|integer|min:1',
             'notes' => 'nullable|string',
-            'peminjam' => 'required|string'
+            'peminjam' => 'required|string',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048'
         ]);
         //dd($request);
         $user = $request->user();
-        DB::transaction(function () use ($request, $user) {
+        DB::transaction(function () use ($request) {
+
             $loan = Loan::create([
                 'peminjam' => $request->peminjam,
                 'status' => 'borrowed',
                 'borrowed_at' => Carbon::now(),
                 'notes' => $request->notes,
             ]);
-            foreach ($request->items as $it) {
-                $tool = Tool::lockForUpdate()->find($it['tool_id']);
-                $qty = (int)$it['quantity'];
-                if ($tool->stock < $qty) {
-                    throw new \Exception("Stok untuk {$tool->name} tidak
-mencukupi.");
+
+            // Simpan foto bukti pinjam
+            if ($request->hasFile('images')) {
+
+                foreach ($request->file('images') as $photo) {
+
+                    $path = $photo->store(
+                        'loan-photos',
+                        'public'
+                    );
+
+                    $loan->image()->create([
+                        'image_path' => $path,
+                        'action' => 'pinjam',
+                    ]);
                 }
-                // kurangi stok
+            }
+
+            foreach ($request->items as $it) {
+
+                $tool = Tool::lockForUpdate()->find($it['tool_id']);
+                $qty = (int) $it['quantity'];
+
+                if ($tool->stock < $qty) {
+                    throw new Exception(
+                        "Stok {$tool->name} tidak mencukupi."
+                    );
+                }
+
                 $tool->decrement('stock', $qty);
+
                 $loan->items()->create([
                     'tool_id' => $tool->id,
                     'quantity' => $qty,
@@ -77,23 +103,31 @@ berhasil dicatat.');
     public function show(Loan $loan)
     {
         $loan->load('items.tool', 'user');
+
+        $borrowImages = $loan->image()
+            ->where('action', 'pinjam')
+            ->get();
+
+        $returnImages = $loan->image()
+            ->where('action', 'kembali')
+            ->get();
         //dd($loan);
         $returnRecords = DB::table('return_records')
-        ->join('loan_items', 'return_records.loan_item_id', '=', 'loan_items.id')
-        ->join('tools', 'loan_items.tool_id', '=', 'tools.id')
-        ->select(
-            'return_records.returned_at',
-            'return_records.quantity',
-            'return_records.condition',
-            'tools.name'
-        )
-        ->where('loan_items.loan_id', $loan->id) // contoh: $loanId = 3
-        ->orderBy('returned_at','desc')
-        ->get();
+            ->join('loan_items', 'return_records.loan_item_id', '=', 'loan_items.id')
+            ->join('tools', 'loan_items.tool_id', '=', 'tools.id')
+            ->select(
+                'return_records.returned_at',
+                'return_records.quantity',
+                'return_records.condition',
+                'tools.name'
+            )
+            ->where('loan_items.loan_id', $loan->id) // contoh: $loanId = 3
+            ->orderBy('returned_at', 'desc')
+            ->get();
 
-            //dd($returnRecords);
+        //dd($returnRecords);
 
-        return view('pages.tool.loan.show', compact(['loan','returnRecords']));
+        return view('pages.tool.loan.show', compact(['loan', 'returnRecords', 'borrowImages', 'returnImages']));
     }
 
     /**
@@ -129,11 +163,14 @@ berhasil dicatat.');
 
     public function return(Loan $loan, Request $request)
     {
+        //dd($request);
         $request->validate([
             'items' => 'required|array',
             'items.*.item_id' => 'required|exists:loan_items,id',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.condition_on_return' => 'nullable|string',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048'
         ]);
 
         DB::transaction(function () use ($loan, $request) {
@@ -169,6 +206,23 @@ berhasil dicatat.');
                 'status' => $allReturned ? 'returned' : 'partial_return',
                 'returned_at' => $allReturned ? now() : null,
             ]);
+
+            // Simpan foto bukti pinjam
+            if ($request->hasFile('images')) {
+
+                foreach ($request->file('images') as $photo) {
+
+                    $path = $photo->store(
+                        'loan-photos',
+                        'public'
+                    );
+
+                    $loan->image()->create([
+                        'image_path' => $path,
+                        'action' => 'kembali',
+                    ]);
+                }
+            }
         });
 
         return redirect()->route('loans.show', $loan)

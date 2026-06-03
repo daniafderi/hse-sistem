@@ -1,6 +1,5 @@
 <x-layouts.app title="Detail Peminjaman">
-    <div class="p-3 sm:p-6 space-y-4 sm:space-y-6"
-        x-data="{ openReturnModal: false }">
+    <div class="p-3 sm:p-6 space-y-4 sm:space-y-6" x-data="{ openReturnModal: false, preview: false, imageSrc: '' }">
 
         <!-- Header -->
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -23,11 +22,12 @@
             <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
 
                 @can('isHseKantor')
-                    <button
-                        @click="openReturnModal = true"
+                    <button @click="openReturnModal = true"
                         class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2
                                text-white bg-indigo-600 rounded-lg shadow
-                               hover:bg-indigo-700 transition text-sm">
+                               hover:bg-indigo-700 transition text-sm @if ($loan->status === 'returned')
+                                   hidden
+                               @endif">
 
                         <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                         Proses Pengembalian
@@ -35,9 +35,7 @@
                 @endcan
 
                 <a href="{{ route('loans.index') }}"
-                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2
-                           text-gray-600 bg-gray-100 rounded-lg
-                           hover:bg-gray-200 transition text-sm">
+                    class="flex items-center gap-2 bg-white border border-gray-300 text-gray-600 hover:text-indigo-600 hover:border-indigo-400 px-4 py-2 rounded-lg text-sm shadow-sm transition w-full sm:w-auto justify-center">
 
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
                     Kembali
@@ -98,8 +96,7 @@
 
                                         @if ($item->tool->image_path)
                                             <img src="{{ Storage::url($item->tool->image_path) }}"
-                                                alt="{{ $item->tool->name }}"
-                                                class="w-full h-full object-cover">
+                                                alt="{{ $item->tool->name }}" class="w-full h-full object-cover">
                                         @else
                                             <div class="w-full h-full flex items-center justify-center text-gray-400">
                                                 <i data-lucide="image" class="w-5 h-5"></i>
@@ -159,6 +156,70 @@
             </div>
         </div>
 
+        <div class="bg-white border rounded-xl shadow-sm p-4 sm:p-5">
+
+            <h3 class="text-base sm:text-lg font-semibold text-gray-700 mb-4">
+                Bukti Peminjaman
+            </h3>
+
+            @if ($borrowImages->count())
+
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+
+                    @foreach ($borrowImages as $image)
+                        <div class="relative group cursor-pointer">
+                            <img src="{{ asset('storage/' . $image->image_path) }}"
+                                class="rounded-lg object-cover w-full h-36 shadow">
+
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition rounded-lg"
+                                @click="imageSrc='{{ asset('storage/' . $image->image_path) }}'; preview=true">
+                                Lihat Foto
+                            </div>
+                        </div>
+                    @endforeach
+
+                </div>
+            @else
+                <div class="text-center py-8 text-gray-400">
+                    Belum ada foto bukti peminjaman
+                </div>
+
+            @endif
+
+        </div>
+
+        <div class="bg-white border rounded-xl shadow-sm p-4 sm:p-5">
+
+            <h3 class="text-base sm:text-lg font-semibold text-gray-700 mb-4">
+                Bukti Pengembalian
+            </h3>
+
+            @if ($returnImages->count())
+
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+
+                    @foreach ($returnImages as $image)
+                        <div class="relative group cursor-pointer">
+                            <img src="{{ asset('storage/' . $image->image_path) }}"
+                                class="rounded-lg object-cover w-full h-36 shadow">
+
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm transition rounded-lg"
+                                @click="imageSrc='{{ asset('storage/' . $image->image_path) }}'; preview=true">
+                                Lihat Foto
+                            </div>
+                        </div>
+                    @endforeach
+
+                </div>
+            @else
+                <div class="text-center py-8 text-gray-400">
+                    Belum ada foto bukti pengembalian
+                </div>
+
+            @endif
+
+        </div>
+
         <!-- Riwayat Pengembalian -->
         <div class="p-3 sm:p-5 bg-white border rounded-xl shadow-sm overflow-hidden">
 
@@ -195,7 +256,6 @@
                     <tbody>
 
                         @forelse ($returnRecords as $log)
-
                             <tr class="border-b hover:bg-gray-50">
 
                                 <td class="px-2 sm:px-4 py-3">
@@ -219,13 +279,11 @@
                         @empty
 
                             <tr>
-                                <td colspan="4"
-                                    class="px-6 py-6 text-center text-gray-400">
+                                <td colspan="4" class="px-6 py-6 text-center text-gray-400">
 
                                     Belum ada pengembalian
                                 </td>
                             </tr>
-
                         @endforelse
 
                     </tbody>
@@ -235,8 +293,7 @@
         </div>
 
         <!-- Delete Box -->
-        <div x-data="{ confirmDelete: false }"
-            class="p-4 sm:p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+        <div x-data="{ confirmDelete: false }" class="p-4 sm:p-6 bg-white rounded-xl shadow-sm border border-gray-100">
 
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
@@ -256,8 +313,7 @@
                 </div>
             </div>
 
-            <button
-                @click="confirmDelete = true"
+            <button @click="confirmDelete = true"
                 class="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2
                        bg-red-700 text-white rounded-lg hover:bg-red-600 transition font-medium">
 
@@ -268,12 +324,10 @@
         </div>
 
         <!-- Modal Pengembalian -->
-        <div x-show="openReturnModal"
-            x-cloak
+        <div x-show="openReturnModal" x-cloak
             class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
 
-            <div
-                @click.away="openReturnModal = false"
+            <div @click.away="openReturnModal = false"
                 class="bg-white w-full max-w-4xl rounded-2xl shadow-lg
                        p-3 sm:p-6 space-y-5
                        max-h-[90vh] overflow-y-auto">
@@ -285,16 +339,13 @@
                         Pengembalian Barang
                     </h3>
 
-                    <button
-                        @click="openReturnModal = false"
-                        class="text-gray-400 hover:text-gray-600">
+                    <button @click="openReturnModal = false" class="text-gray-400 hover:text-gray-600">
 
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
 
-                <form action="{{ route('loans.return', $loan) }}"
-                    method="POST"
+                <form action="{{ route('loans.return', $loan) }}" method="POST" enctype="multipart/form-data"
                     class="space-y-6">
 
                     @csrf
@@ -302,7 +353,6 @@
                     <div class="divide-y divide-gray-100 border rounded-xl">
 
                         @foreach ($loan->items as $item)
-
                             @php
                                 $sisa = $item->quantity - $item->returned_quantity;
                             @endphp
@@ -310,12 +360,12 @@
                             <div class="p-3 sm:p-4 flex flex-col lg:flex-row gap-4 lg:items-start">
 
                                 <!-- Thumbnail -->
-                                <div class="w-full lg:w-20 h-40 lg:h-20 rounded-xl overflow-hidden border bg-gray-100 shrink-0">
+                                <div
+                                    class="w-full lg:w-20 h-40 lg:h-20 rounded-xl overflow-hidden border bg-gray-100 shrink-0">
 
                                     @if ($item->tool->image_path)
                                         <img src="{{ Storage::url($item->tool->image_path) }}"
-                                            alt="{{ $item->tool->name }}"
-                                            class="w-full h-full object-cover">
+                                            alt="{{ $item->tool->name }}" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-gray-400">
                                             <i data-lucide="image" class="w-6 h-6"></i>
@@ -331,8 +381,7 @@
                                         {{ $item->tool->name }}
                                     </h4>
 
-                                    <input type="hidden"
-                                        name="items[{{ $loop->index }}][item_id]"
+                                    <input type="hidden" name="items[{{ $loop->index }}][item_id]"
                                         value="{{ $item->id }}">
 
                                     <p class="text-xs text-gray-500 mt-1">
@@ -350,11 +399,8 @@
                                             Jumlah
                                         </label>
 
-                                        <input type="number"
-                                            name="items[{{ $loop->index }}][quantity]"
-                                            min="0"
-                                            max="{{ $sisa }}"
-                                            placeholder="0"
+                                        <input type="number" name="items[{{ $loop->index }}][quantity]"
+                                            min="0" max="{{ $sisa }}" placeholder="0"
                                             class="w-full border-gray-300 rounded-lg text-sm">
                                     </div>
 
@@ -364,8 +410,7 @@
                                             Kondisi
                                         </label>
 
-                                        <input type="text"
-                                            name="items[{{ $loop->index }}][condition_on_return]"
+                                        <input type="text" name="items[{{ $loop->index }}][condition_on_return]"
                                             placeholder="Baik / Lecet / Rusak"
                                             class="w-full border-gray-300 rounded-lg text-sm">
                                     </div>
@@ -373,23 +418,25 @@
                                 </div>
 
                             </div>
-
                         @endforeach
 
                     </div>
 
+                    <!-- Upload Foto -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Upload Foto Dokumentasi</label>
+                        <x-input-multiple-files name="images[]"></x-input-multiple-files>
+                    </div>
+
                     <div class="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-3 border-t">
 
-                        <button
-                            type="button"
-                            @click="openReturnModal = false"
+                        <button type="button" @click="openReturnModal = false"
                             class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">
 
                             Batal
                         </button>
 
-                        <button
-                            type="submit"
+                        <button type="submit"
                             class="px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">
 
                             Simpan
@@ -400,6 +447,17 @@
                 </form>
             </div>
         </div>
+
+        <!-- PREVIEW IMAGE -->
+        <template x-if="preview">
+            <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                <div class="relative max-w-4xl w-full px-4">
+                    <button @click="preview=false"
+                        class="absolute top-4 right-4 bg-white rounded-full p-2 shadow">✕</button>
+                    <img :src="imageSrc" class="rounded-lg max-h-[90vh] mx-auto">
+                </div>
+            </div>
+        </template>
 
         <script>
             document.addEventListener("DOMContentLoaded", () => {

@@ -20,4 +20,8 @@ class Loan extends Model
     {
         return $this->hasMany(LoanItem::class);
     }
+    public function image() 
+    {
+        return $this->hasMany(LoanImage::class);
+    }
 }
