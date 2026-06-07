@@ -226,7 +226,7 @@
 
 
             <!-- ================= MODAL VALIDASI ================= -->
-            @can('manage-report', $dailyReport)
+            
                 
             <div x-show="openModal" x-transition
                 class="fixed inset-0 z-40 bg-black/40 flex items-center justify-center">
@@ -254,7 +254,7 @@
                     </form>
                 </div>
             </div>
-
+            @can('manage-report', $dailyReport)
             <!-- Delete Box -->
             <div x-data="{ confirmDelete: false }" class="p-6 mt-6 bg-white rounded-lg shadow-sm border border-gray-100">
 

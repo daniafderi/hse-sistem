@@ -36,7 +36,7 @@ class ValidationSafetyPatrolController extends Controller
             'komentar' => 'nullable|string',
         ]);
         //dd(auth()->id());
-    
+
         // Simpan riwayat validasi
         ValidationSafetyPatrol::create([
             'safety_patrol_id' => $report->id,
@@ -46,26 +46,26 @@ class ValidationSafetyPatrolController extends Controller
         ]);
 
         //dd($request->status);
-    
+
         // Update status laporan
         $report->update([
             'status_validasi' => $request->status,
         ]);
 
         $notif = Notification::create([
-    'type' => 'report_validate',
-    'title' => 'Laporan divalidasi',
-    'message' => 'Laporan telah divalidasi',
-    'notifiable_id' => $report->id,
-    'notifiable_type' => DailySafetyPatrol::class,
-    'created_by' => auth()->id()
-]);
+            'type' => 'report_validate',
+            'title' => 'Laporan divalidasi',
+            'message' => 'Laporan telah divalidasi',
+            'notifiable_id' => $report->id,
+            'notifiable_type' => DailySafetyPatrol::class,
+            'created_by' => auth()->id()
+        ]);
 
-$users = User::whereIn('role', ['hselapangan', 'supervisor'])->pluck('id');
+        $users = User::whereIn('role', ['hselapangan', 'supervisor'])->pluck('id');
 
-// kirim ke user tertentu
-$notif->users()->attach($users);
-    
+        // kirim ke user tertentu
+        $notif->users()->attach($users);
+
         return back()->with('toast_success', 'Validasi berhasil disimpan.');
     }
 
