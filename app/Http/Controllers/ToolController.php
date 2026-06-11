@@ -210,12 +210,14 @@ class ToolController extends Controller
 
         $rowExcel = 9;
 
-        $data = Tool::with(['stockTransaction' => function ($query) use ($tanggalMulai, $tanggalAkhir) {
-            $query->whereBetween('created_at', [
-                $tanggalMulai->toDateString(),
-                $tanggalAkhir->toDateString()
-            ]);
-        }])->get();
+        $data = Tool::with([
+            'stockTransaction' => function ($query) use ($tanggalMulai, $tanggalAkhir) {
+                $query->whereBetween('created_at', [
+                    $tanggalMulai->copy()->startOfDay(),
+                    $tanggalAkhir->copy()->endOfDay()
+                ])->orderBy('created_at');
+            }
+        ])->get();
 
         //dd($data);
 
