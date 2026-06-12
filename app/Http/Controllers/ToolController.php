@@ -280,8 +280,9 @@ class ToolController extends Controller
             // 3️⃣ Isi dari transaksi
             foreach ($tool->stockTransaction as $trx) {
 
-                $day = $tanggalMulai->copy()
-                    ->diffInDays(Carbon::parse($trx->created_at), false) + 1;
+                $day = $tanggalMulai->copy()->startOfDay()
+                    ->diffInDays($trx->created_at->copy()->startOfDay(), false) + 1;
+
 
                 if ($day >= 1 && $day <= 6) {
 
