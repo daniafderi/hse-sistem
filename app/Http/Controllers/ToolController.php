@@ -214,10 +214,17 @@ class ToolController extends Controller
             'stockTransaction' => function ($query) use ($tanggalMulai, $tanggalAkhir) {
                 $query->whereBetween('created_at', [
                     $tanggalMulai->copy()->startOfDay(),
-                    $tanggalAkhir->copy()->endOfDay()
+                    $tanggalAkhir->copy()->endOfDay(),
                 ])->orderBy('created_at');
+            },
+            'stockTransactions' => function ($query) use ($tanggalMulai) {
+                $query->where('created_at', '<', $tanggalMulai->copy()->startOfDay())
+                    ->latest('created_at')
+                    ->limit(1);
             }
         ])->get();
+
+
 
         //dd($data);
 
@@ -233,11 +240,32 @@ class ToolController extends Controller
 
         foreach ($data as $index => $tool) {
 
+            $lastBeforePeriod = $tool->stockTransactions->first();
+
+            if ($lastBeforePeriod) {
+                $stockAwal = $lastBeforePeriod->type === 'in'
+                    ? $lastBeforePeriod->stock_before + $lastBeforePeriod->quantity
+                    : $lastBeforePeriod->stock_before - $lastBeforePeriod->quantity;
+            } else {
+                $stockAwal = 0;
+            }
+
+            $stockAkhir = $stockAwal;
+
+            foreach ($tool->stockTransaction as $trx) {
+
+                if ($trx->type === 'in') {
+                    $stockAkhir += $trx->quantity;
+                } else {
+                    $stockAkhir -= $trx->quantity;
+                }
+            }
+
             // 1️⃣ Tulis nama APD
             $sheet->setCellValue('A' . $rowExcel, $index + 1);
             $sheet->setCellValue('B' . $rowExcel, $tool->name);
-            $sheet->setCellValue('D' . $rowExcel, $tool->stockTransaction->first()?->stock_before ?? 0);
-            $sheet->setCellValue('Q' . $rowExcel, $tool->stock);
+            $sheet->setCellValue('D' . $rowExcel, $stockAwal);
+            $sheet->setCellValue('Q' . $rowExcel, $stockAkhir);
 
             // 2️⃣ Init data harian
             $days = [];
@@ -252,7 +280,7 @@ class ToolController extends Controller
             // 3️⃣ Isi dari transaksi
             foreach ($tool->stockTransaction as $trx) {
 
-                $day = $tanggalMulai
+                $day = $tanggalMulai->copy()
                     ->diffInDays(Carbon::parse($trx->created_at), false) + 1;
 
                 if ($day >= 1 && $day <= 6) {
@@ -265,7 +293,7 @@ class ToolController extends Controller
                 }
             }
 
-            // 4️⃣ Masukkan ke Excel (Masuk & Keluar)
+            // 4️⃣ Masukkan ke Excel
             foreach ($days as $day => $val) {
 
                 $baseCol = $startColumnIndex + (($day - 1) * 2);

@@ -18,4 +18,8 @@ class Tool extends Model
     public function stockTransaction() {
         return $this->hasMany(StockApdTransaction::class);
     }
+
+    public function stockTransactions() {
+        return $this->hasMany(StockApdTransaction::class);
+    }
 }
