@@ -457,6 +457,7 @@ class LaporanExportController extends Controller
         $sheetUac->setCellValue('G7', 'Bulan : ' . $start->translatedFormat('F') . ' Tahun : ' . $end->translatedFormat('Y'));
         $sheetSb->setCellValue('I1', now()->format('d M Y'));
         $sheetSafetyPatrol->setCellValue('E8', 'Bulan : ' . $start->translatedFormat('F') . ' Tahun : ' . $end->translatedFormat('Y'));
+        $sheetSafetyPatrol->setCellValue('N2', now()->format('d M Y'));
         // Permit
         $gabungan = DailySafetyPatrol::where('permit', 'Gabungan')->count();
         $ketinggian = DailySafetyPatrol::where('permit', 'Ketinggian')->count();
