@@ -65,7 +65,7 @@
                                 </td>
 
                                 <td class="px-4 sm:px-6 py-4 hidden md:table-cell">
-                                    {{ \Carbon\Carbon::parse($loan->loan_date)->format('d M Y') }}
+                                    {{ \Carbon\Carbon::parse($loan->borrowed_at)->format('d M Y') }}
                                 </td>
 
                                 <td class="px-4 sm:px-6 py-4 hidden lg:table-cell">
