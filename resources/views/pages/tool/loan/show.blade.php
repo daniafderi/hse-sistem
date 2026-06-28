@@ -321,6 +321,37 @@
                 Hapus
             </button>
 
+            <!-- Modal Konfirmasi -->
+                <div x-show="confirmDelete" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50"
+                    x-transition.opacity>
+
+                    <div class="bg-white w-full max-w-sm rounded-lg p-6 shadow-xl" x-transition.scale>
+
+                        <h3 class="text-lg font-semibold text-gray-800">Konfirmasi Penghapusan</h3>
+                        <p class="text-sm text-gray-500 mt-2">
+                            Apakah Anda yakin? Tindakan ini tidak dapat dibatalkan.
+                        </p>
+
+                        <div class="flex items-center justify-end gap-3 mt-6">
+
+                            <button @click="confirmDelete = false"
+                                class="px-4 py-2 text-sm rounded-lg border border-gray-300 hover:bg-gray-100 transition">
+                                Batal
+                            </button>
+
+                            <form method="POST" action="{{ route('loans.destroy', $loan->id) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="px-4 py-2 rounded-lg bg-red-500 text-sm text-white hover:bg-red-600 transition">
+                                    Ya, Hapus
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
         </div>
 
         <!-- Modal Pengembalian -->
